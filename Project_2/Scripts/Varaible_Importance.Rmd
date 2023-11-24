@@ -1,0 +1,40 @@
+---
+title: "Variable Importance"
+output: html_document
+date: "2023-11-24"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+The following chunk of code is a utility function that helps display the variable importance of each feature. It helps in understanding which features have the most influence on the model's performance.
+
+
+```{r}
+# Function for Variable Importance
+variable_importance <- function(model) {
+  # Get feature importances directly from the model
+  feature_importances <- importance(model)
+  
+  # Convert the matrix to a data frame for sorting and printing
+  feature_importances_df <- data.frame(
+    Variable = rownames(feature_importances),
+    Importance = feature_importances[, 1]
+  )
+  
+  # Sort the feature importances by most important first
+  feature_importances_df <- feature_importances_df[order(feature_importances_df$Importance, decreasing = TRUE), ]
+  
+  # Print out the feature and importances
+  cat("Feature Importances:\n")
+  for (i in 1:nrow(feature_importances_df)) {
+    cat("Variable:", feature_importances_df$Variable[i], "Importance:", feature_importances_df$Importance[i], "\n")
+  }
+  
+  return(feature_importances_df)  # Return the sorted feature importances as a data frame
+}
+
+```

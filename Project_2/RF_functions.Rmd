@@ -1,0 +1,229 @@
+---
+title: "project_2"
+output: html_document
+date: "2023-10-28"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(randomForest)
+library(caret)
+```
+
+```{r}
+df <- read.csv('final_df_preprocessed.csv')
+
+
+split_train_test <- function(data, train_ratio = 0.8) {
+  set.seed(123)
+  indices <- createDataPartition(data$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s, p = train_ratio, list = FALSE)
+  train_data <- data[indices, ]
+  test_data <- data[-indices, ]
+  return(list(train_data = train_data, test_data = test_data))
+}
+
+train_random_forest <- function(train_data) {
+  hyper_grid <- expand.grid(mtry = seq(2, 10, by = 2))
+  
+  ctrl <- trainControl(method = "cv", number = 5 , verboseIter = TRUE)
+  model <- train(
+    Air_Flow_Rate_from_Mass_Flow_Sensor_g_s ~ .,
+    data = train_data,
+    method = "rf",
+    tuneGrid = hyper_grid,
+    trControl = ctrl
+  )
+  return(model)
+}
+
+get_feature_importance <- function(trained_model) {
+  importance <- importance(trained_model)
+  return(importance)
+}
+
+test_model <- function(trained_model, test_data) {
+  predictions <- predict(trained_model, test_data)
+  rmse <- sqrt(mean((test_data$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s - predictions)^2))
+  rsquared <- 1 - (sum((test_data$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s - predictions)^2) / sum((test_data$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s - mean(test_data$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s))^2))
+  return(list(RMSE = rmse, Rsquared = rsquared))
+}
+```
+
+```{r}
+str(df)
+```
+
+```{r}
+df <- df[, !names(df) %in% c("X" , "Time")]
+
+df[is.na(df)] <- 0
+
+str(df)
+```
+```{r}
+
+# Linear method of training 
+
+hyper_grid <- expand.grid(mtry = c(2, 4, 6, 8 ,10))
+
+best_model <- NULL
+best_rmse <- Inf
+df_2 <- subset(df, label == "fleet2")
+df_2 <- df_2[, !names(df_2) %in% c("label")]
+
+split <- split_train_test(df_2, train_ratio = 0.8)
+train_data <- split$train_data
+test_data <- split$test_data
+
+for (i in 1:nrow(hyper_grid)) {
+  mtry_val <- hyper_grid$mtry[i]
+  
+  model <- randomForest(Air_Flow_Rate_from_Mass_Flow_Sensor_g_s ~ ., data = train_data, mtry = 4, ntree = 100)
+  
+  predictions <- predict(model, test_data)
+  rmse <- sqrt(mean((test_data$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s - predictions)^2))
+  
+  print(mtry_val , rmse)
+  
+  if (rmse < best_rmse) {
+    best_model <- model
+    best_rmse <- rmse
+  }
+}
+
+
+print(best_model)
+print(best_rmse)
+```
+
+```{r}
+
+best_model
+```
+```{r}
+best_rmse
+```
+
+
+```{r}
+get_feature_importance(best_model)
+```
+
+
+```{r}
+saveRDS(best_model, file = "tuned_model_for_fleet_2.rds") 
+```
+
+
+
+```{r}
+#training for fleet2
+
+df_2 <- subset(df, label == "fleet2")
+df_2 <- df_2[, !names(df_2) %in% c("label")]
+
+
+split <- split_train_test(df_2, train_ratio = 0.8)
+train_data <- split$train_data
+test_data <- split$test_data
+
+
+tuned_model <- train_random_forest(train_data)
+
+
+best_params <- tuned_model$bestTune
+print(best_params)
+
+
+importance <- get_feature_importance(tuned_model)
+print(importance)
+
+
+results <- test_model(tuned_model, test_data)
+cat("RMSE:", results$RMSE, "\n")
+cat("R-squared:", results$Rsquared, "\n")
+```
+
+
+```{r}
+saveRDS(tuned_model, file = "tuned_model_for_fleet_2.rds")
+```
+
+
+```{r}
+#training for fleet3
+
+df_3 <- subset(df, label == "fleet3")
+df_3 <- df_3[, !names(df_3) %in% c("label")]
+
+
+split <- split_train_test(df_3, train_ratio = 0.8)
+train_data <- split$train_data
+test_data <- split$test_data
+
+
+tuned_model_3 <- train_random_forest(train_data)
+
+
+best_params_3 <- tuned_model_3$bestTune
+print(best_params_3)
+
+
+importance_3 <- get_feature_importance(tuned_model_3)
+print(importance)
+
+
+results_3 <- test_model(tuned_model_3, test_data)
+cat("RMSE:", results$RMSE, "\n")
+cat("R-squared:", results$Rsquared, "\n")
+```
+
+
+```{r}
+#training for fleet4
+
+df_4 <- subset(df, label == "fleet4")
+df_4 <- df_4[, !names(df_4) %in% c("label")]
+
+
+split <- split_train_test(df_4, train_ratio = 0.8)
+train_data <- split$train_data
+test_data <- split$test_data
+
+
+tuned_model_4 <- train_random_forest(train_data)
+
+
+best_params_4 <- tuned_model_4$bestTune
+print(best_params_4)
+```
+```{r}
+model_4<-tuned_model_4$finalModel
+```
+```{r}
+
+
+best_params_4
+```
+
+```{r}
+importance_4 <- get_feature_importance(tuned_model_4$finalModel)
+print(importance_4)
+
+
+results_4 <- test_model(tuned_model_4$finalModel, test_data)
+cat("RMSE:", results_4$RMSE, "\n")
+cat("R-squared:", results_4$Rsquared, "\n")
+```
+```{r}
+saveRDS(model_4, file = "tuned_model_for_fleet_4.rds")
+```

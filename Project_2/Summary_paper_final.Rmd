@@ -1,0 +1,113 @@
+---
+title: "Monitoring Engine Health Through Better Air Flow Rate"
+date: "2023-11-25"
+bibliography: "bibliography.bib"
+output: 
+  html_document:
+    theme: journal
+    code_folding: hide
+    number_sections: FALSE
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+author: 
+  - name          : "Raghav Agarwal"
+    affiliation   : "1"
+    corresponding : yes
+    address       : "Arlington,VA"
+    email         : "raghav.agarwal@gwu.edu"
+    role: 
+      - "Descriptive Analysis"
+      - "Solution Building"
+      - "Project 2 Proposal"
+  - name          : "Harshavardana Reddy Kolan"
+    affiliation   : "2"
+    corresponding : no    # Define only one corresponding author
+    address       : "Fairfax,VA"
+    email         : "harshavardanareddy.kolan@gwu.edu"
+    role:
+      - "Descriptive Analysis"
+      - "Solution Building"
+      - "Clustering based on Fuel Mass"
+      
+  - name          : "Shikha Kumari"
+    affiliation   : "3"
+    corresponding : no
+    address       : "Arlington,VA"
+    email         : "shikha.kumari@gwu.edu"
+    role: 
+      - "Creation of Label Column"
+      - "Segregation of following and not-following parameters"
+      - "Analysis of C.I. for Environment and Temperature related parameters"
+      
+  - name          : "Sanjayram Raja Srinivasan"
+    affiliation   : "4"
+    corresponding : no    # Define only one corresponding author
+    address       : "Arlington,VA"
+    email         : "sanjayram.rajasrinivasan@gwu.edu"
+    role: 
+      - "Segregation of Following and Not Following Parameters"
+      - "Analysis of Trip related parameters"
+
+affiliation:
+  - id            : "1 , 2 , 3 , 4"
+    institution   : "The George Washington University"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = F, message = F)
+```
+
+## ABSTRACT
+
+## About the Data
+
+The Vehicle Energy Dataset (VED), utilized in our project, stands as a significant contribution to understanding vehicle behavior and energy consumption patterns, encompassing a vast array of data collected from 383 personal cars in Ann Arbor, Michigan. This comprehensive open dataset contains detailed GPS trajectories alongside time-series data on fuel, energy, speed, and auxiliary power usage.
+
+The breadth and depth of the Vehicle Energy Dataset (VED) are underscored by its inclusion of various vehicle types, providing a comprehensive view of the automotive landscape. Within this dataset, the presence of 264 gasoline vehicles, 92 hybrid electric vehicles (HEVs), and 27 plug-in hybrid/electric vehicles (PHEV/EVs) offers an expansive spectrum for analysis. These distinct vehicle categories inherently possess diverse energy consumption patterns and driving behaviors, forming a rich tapestry of information essential for comparative studies and nuanced insights into the energy dynamics across different vehicle technologies.
+
+VED's temporal scope, spanning from November 2017 to November 2018, encapsulates a full year of driving experiences. This duration encompasses a wide array of seasons, from the crisp days of fall to the snowy winters and the bloom of spring, presenting an invaluable opportunity to observe how driving conditions fluctuate throughout the year. Moreover, the dataset's documentation of real-world driving scenarios offers a comprehensive glimpse into diverse terrains, from urban sprawls with congested traffic to highways with varying speed limits, thereby capturing the complexities of driving environments that directly impact energy consumption and efficiency.
+
+The accumulation of 374,000 miles within this timeframe signifies not just a vast quantity of data but a rich repository of real-world driving experiences. Each mile logged in the dataset represents a unique journey, a distinct set of driving behaviors, and energy usage patterns. This extensive mileage contributes to the dataset's robustness, providing a substantial foundation for conducting in-depth analyses and deriving statistically significant conclusions regarding vehicle energy consumption and performance across different driving contexts and vehicle types.
+
+In essence, VED's inclusion of diverse vehicle types, coupled with its comprehensive coverage of driving conditions across seasons and terrains, alongside the substantial mileage accumulated, positions it as a goldmine for researchers and practitioners seeking to explore, understand, and optimize vehicle energy usage and behavior. This depth and diversity pave the way for multifaceted analyses and innovative solutions aimed at enhancing the efficiency and sustainability of future automotive technologies.
+
+Given the extensive and diverse nature of the Vehicle Energy Dataset (VED), encompassing various vehicle types and driving conditions across seasons and terrains, our project aims to leverage this wealth of information to analyze and optimize vehicle energy usage. In pursuit of our goal to develop an engine recommendation system, we are now focusing on comparing other clusters (termed as fleets) within the dataset to identify similarities with 'fleet1,' the cluster exhibiting suboptimal performance in Air Flow Rate. This comparative analysis will provide valuable insights into the diverse behaviors across different vehicle groups, facilitating our efforts to enhance driving efficiency and offer actionable guidance to drivers.
+
+We are engaged in a project titled "Monitoring Vehicles Health," aiming to develop an engine recommendation system. Our focus is on utilizing distinct machine learning models to provide actionable guidance to drivers, helping them optimize Air Flow Rate while on the road.
+
+In our dataset, which comprises multiple distinct groups of data, we initially categorized the data into corresponding groups. Employing K-means clustering, we further segmented each group to form distinct clusters or labels.
+
+During our analysis, an intriguing observation emerged when examining the clustered dataset using boxplots. Specifically, we noticed that certain clusters within the dataset, namely 'KA_BB', 'KA_RT', 'S_KA', exhibited nearly identical means, as did clusters like 'KA_KA', 'S_S', and 'RT_S', 'BB_RT', and 'RT_RT', 'S_CW'.
+
+To streamline our analysis, we merged these clusters exhibiting similar behavior, leading to the creation of four new clusters: 'fleet1', 'fleet2', 'fleet3', and 'fleet4'. Upon investigating these clusters' behavior concerning the 'Air_Flow_Rate_from_Mass_Flow_Sensor_g_s' column (y_label), we observed that 'fleet1' demonstrated the poorest performance. Consequently, we conducted a detailed analysis specifically focused on 'fleet1' to establish a benchmark before proceeding with our main objectives.
+
+### Problem Statement:
+
+Our primary focus now lies in analyzing the remaining clusters (referred to as fleets) to discern which among them exhibits similarities to 'fleet1', the underperforming cluster identified earlier. This comparison will enable us to draw insights and further understand the similarities and differences between the fleet clusters, aiding us in addressing our project goals effectively.
+
+### Parametric Description:
+
+**Intake Manifold Absolute Pressure [kPa]:** refers to the atmospheric pressure within the engine's intake manifold, measured in kilopascals. It signifies the pressure level crucial for optimizing fuel-air mixture, influencing engine performance and efficiency.
+
+**Engine RPM(rpm):** This indicates how fast the engine is spinning. It's crucial for understanding engine performance and fuel consumption, as higher RPMs often mean higher fuel consumption.
+
+**Vehicle Speed Sensor [km/h]:** measures the speed of a vehicle in kilometers per hour. It provides real-time data on the vehicle's movement, essential for monitoring speed, navigation, and analyzing driving behavior or performance.
+
+**Accelerator Pedal Position D(%) and Accelerator Pedal Position E(%):** These show the percentage of depression of the accelerator pedal. It helps in understanding driver behavior and how aggressively the vehicle is being driven.
+
+**Engine Coolant Temperature (°C):** It indicates the temperature of the engine coolant, which is important for engine performance and efficiency.
+
+**Intake Air Temperature(°C):** This measures the temperature of the air entering the engine. Cooler air is denser, which can affect combustion efficiency and fuel consumption.
+
+**Absolute Throttle Position B(%):** This is the percentage at which the throttle is open. It's important because it shows how much power the engine is producing relative to its maximum capacity.
+
+**Ambient Air Temperature [Â°C]:**The quantitative representation of the atmospheric air's temperature in a specific location at a given time.
+
+
+
+
+
+
+

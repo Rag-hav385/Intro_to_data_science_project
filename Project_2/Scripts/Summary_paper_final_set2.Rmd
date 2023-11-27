@@ -1,0 +1,978 @@
+---
+title: "Monitoring Engine Health Through Better Fuel Consumption"
+date: "2023-10-26"
+bibliography: "bibliography.bib"
+output: 
+  html_document:
+    theme: journal
+    code_folding: hide
+    number_sections: FALSE
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+author: 
+  - name          : "Raghav Agarwal"
+    affiliation   : "1"
+    corresponding : yes
+    address       : "Arlington,VA"
+    email         : "raghav.agarwal@gwu.edu"
+    role: 
+      - "Descriptive Analysis"
+      - "Solution Building"
+      - "Project 2 Proposal"
+  - name          : "Harshavardana Reddy Kolan"
+    affiliation   : "2"
+    corresponding : no    # Define only one corresponding author
+    address       : "Fairfax,VA"
+    email         : "harshavardanareddy.kolan@gwu.edu"
+    role:
+      - "Descriptive Analysis"
+      - "Solution Building"
+      - "Clustering based on Fuel Mass"
+      
+  - name          : "Shikha Kumari"
+    affiliation   : "3"
+    corresponding : no
+    address       : "Arlington,VA"
+    email         : "shikha.kumari@gwu.edu"
+    role: 
+      - "Creation of Label Column"
+      - "Segregation of following and not-following parameters"
+      - "Analysis of C.I. for Environment and Temperature related parameters"
+      
+  - name          : "Sanjayram Raja Srinivasan"
+    affiliation   : "4"
+    corresponding : no    # Define only one corresponding author
+    address       : "Arlington,VA"
+    email         : "sanjayram.rajasrinivasan@gwu.edu"
+    role: 
+      - "Segregation of Following and Not Following Parameters"
+      - "Analysis of Trip related parameters"
+
+affiliation:
+  - id            : "1 , 2 , 3 , 4"
+    institution   : "The George Washington University"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = F, message = F)
+```
+
+## ABSTRACT
+
+In this data-driven project where trip parameters, temperature-related data, emissions-related metrics, voltage-related information, and throttle and pedal inputs are the focus, the goal is to enhance fuel efficiency and cost-effectiveness. Through comprehensive monitoring and analysis, this endeavor combines real-time and long-term data collection and analysis techniques. The project aims to pinpoint inefficiencies in driving habits, craft optimized routes using GPS data, implement proactive vehicle maintenance grounded in engine parameters, and closely monitor fuel efficiency metrics. Leveraging Statistics, it promises substantial cost savings, emissions reduction, and environmental sustainability, especially for commercial fleets grappling with high fuel costs. This project fosters a culture of data-informed decisions, empowering both individual drivers and fleet managers to make fuel-efficient and eco-friendly transportation choices, contributing to global efforts to reduce carbon emissions and ensure the financial sustainability of the transportation sector.
+
+Keywords: Fuel Consumption Analysis, Clustering, Confidence - Interval, Recommendation , K-Means 
+
+
+
+## Dataset
+
+Collecting On-Board Diagnostics (OBD) data is pivotal for vehicle diagnostics, offering insights into engine health, performance, and fuel efficiency. However, limitations arise when working with data from a single car and driver. The dataset's lack of diversity hinders broad conclusions and predictions due to the limited representation of driving conditions and behaviors. This data's inherent bias makes it challenging to apply findings universally. External factors impacting fuel economy are unaccounted for, and the dataset's parameters may not suffice for accurate predictions. To enhance reliability, a more extensive, diverse dataset spanning various vehicles, drivers, and conditions is essential for meaningful OBD data analysis.
+
+![On-Board Diagnostics Data Collection](C:\Users\ragha\OneDrive\Desktop\Data_science\Data_sciecne_project_1\obd_image.webp)
+
+### Analysis of dataset
+
+#### Descriptive Analysis
+
+
+**Trip Related:**
+This category of parameters primarily focuses on various aspects related to trips and journeys undertaken by the vehicle. These parameters include metrics such as acceleration times, trip distances, and fuel efficiency figures, which are crucial for evaluating the performance and cost-effectiveness of a journey. It also provides insights into the behavior of the vehicle during travel, including fuel consumption, speed, and time spent stationary or moving. These trip-related parameters are essential for both individual drivers and fleet managers, as they enable a detailed assessment of the efficiency and cost-effectiveness of specific trips or journeys.
+
+**Environment and Temperature Related:**
+In the "Environment and Temperature Related" category, parameters are dedicated to monitoring and reporting on the external conditions and temperatures surrounding the vehicle. These parameters are essential for understanding how environmental factors can impact vehicle performance and efficiency. Parameters such as ambient air temperature, barometric pressure, and emissions data provide valuable information about the environmental conditions in which the vehicle operates. Additionally, temperatures, including engine coolant temperature, oil temperature, and intake air temperature, are crucial for diagnosing engine health and ensuring optimal operation under varying conditions.
+
+**Voltage Related:**
+The "Voltage Related" category encompasses parameters that focus on electrical aspects of the vehicle. These parameters are vital for monitoring the electrical systems and ensuring the proper functioning of the vehicle's control modules and diagnostic equipment. The voltage data from the control module and OBD adapter provide insights into the electrical stability of the vehicle, which is critical for the reliable operation of various onboard systems and sensors.
+
+**Throttle Related:**
+Throttle-related parameters are essential for assessing the control and responsiveness of the vehicle's throttle system. Absolute throttle position and relative throttle position measurements offer valuable information on the driver's interaction with the throttle, which impacts engine performance and fuel efficiency. Accelerator pedal position data (D, E, and F) further provide insights into how the driver is manipulating the accelerator, offering a glimpse into the vehicle's behavior under various driving conditions.
+
+**Oil Related:**
+In the "Oil Related" category, parameters are focused on monitoring aspects related to the vehicle's engine oil and torque. Engine oil temperature is a critical metric for assessing the health of the engine's lubrication system. Additionally, engine reference torque provides valuable data on the engine's performance and capacity, aiding in diagnostics and performance evaluation. These parameters are crucial for ensuring the engine's longevity and operational efficiency.
+
+
+#### Null and Correlation with Fuel Mass
+
+```{r}
+df = read.csv('dataset.csv')
+
+missing_percentage <- colMeans(is.na(df)) * 100
+
+
+missing_df <- data.frame(
+  Variable = names(missing_percentage),
+  MissingPercentage = missing_percentage
+)
+library(dplyr)
+
+filtered_df <- missing_df %>%
+  filter(MissingPercentage > 5)
+
+
+missing_df <- missing_df[order(-missing_df$MissingPercentage), ]
+
+
+library(ggplot2)
+
+nulplot <- ggplot(filtered_df, aes(x = reorder(Variable, MissingPercentage), y = MissingPercentage)) +
+  geom_bar(stat = "identity", fill = "blue", width = 0.7) +
+  labs(x = "Variables", y = "Percentage of Missing Values") +
+  ggtitle("Percentage of Missing Values greater than 5%") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +  
+  coord_flip()  
+
+
+print(nulplot)
+
+```
+
+The dataset contains a list of variables along with their respective percentages of missing values. 
+
+The variable "DPF_Pressure(psi)" has 100% missing values, meaning there is no available data for this variable. Similarly, several other variables like "Engine_Oil_Temperature(°C)", "Fuel_trim_bank_1_sensor_2(%)", and "DPF_Temperature(°C)" also have 100% missing values.
+
+On the other hand, variables such as "Torque(Nm)", "Horsepower_(At_the_wheels)(hp)", and "Engine_kW_(At_the_wheels)(kW)" have relatively lower percentages of missing values, ranging from around 48.79% to 48.29%.
+
+A subset of variables have missing values less than or equal to 5%, and these include "Throttle_Position(Manifold)(%)", "Fuel_trim_bank_1_sensor_1(%)", and "Engine_Load(%)", among others.
+
+The remaining variables, such as "Speed_(OBD)(km/h)", "Speed_(GPS)(km/h)", and "Device_Time" have no missing values.
+
+Overall, the dataset exhibits varying levels of missingness across its variables, which may warrant different strategies for data imputation or analysis depending on the specific context and purpose of the dataset.
+
+
+```{r}
+library(corrr)
+library(ggplot2)
+
+
+data_pre = read.csv('Dataset_preprocessed.csv')
+data_pre = subset(data_pre, select = -c(X0.100kph_Time.s., Accelerator_PedalPosition_F..., Actual_engine_._torque..., Air_Fuel_Ratio.Commanded...1., Ambient_air_temp..C., DPF_Pressure.psi., DPF_Temperature..C., Engine_Oil_Temperature..C., Engine_reference_torque.Nm., Fuel_trim_bank_1_sensor_2..., Turbo_Pressure_Control.psi., Volumetric_Efficiency_.Calculated....)
+                  )
+
+data_pre <- data_pre %>% mutate_if(is.character, as.numeric)
+
+x <- data_pre %>% 
+  correlate() %>% 
+  focus(Fuel_mass)
+
+x <- na.omit(x)
+
+x %>% 
+  
+  ggplot(aes(x = term, y = Fuel_mass)) +
+    geom_bar(stat = "identity") +
+    ylab("Correlation with Fuel_mass") +
+    xlab("Variable") + theme(text = element_text(size=8),axis.text.x = element_text(angle = 90, vjust = 1, hjust=1)) + labs(title = 'Correlation with Fuel_mass')
+  
+```
+
+<br>
+
+The correlation analysis reveals the relationship between the Fuel_mass column and the other parameters in the dataset. Several columns exhibit significant correlations with fuel mass, which can provide valuable insights into factors affecting fuel consumption. Notable positive correlations are observed with parameters like Engine_Load, Engine_Load(Absolute), Engine_RPM, Throttle_Position(Manifold), Torque, and Accelerator_PedalPosition_E. These parameters suggest that higher engine load, RPM, and throttle position are associated with increased fuel consumption, as expected. Additionally, Fuel_flow_rate/hour and Fuel_flow_rate/minute have a perfect correlation of 1, indicating that they are directly proportional to fuel mass. On the other hand, negative correlations are observed with parameters such as Altitude, Acceleration_Sensor(Z axis), Fuel_Trim_Bank_1_Long_Term, and Fuel_Trim_Bank_1_Short_Term, suggesting that higher altitudes and specific fuel trim values are associated with lower fuel mass. This analysis provides valuable insights into the interplay of various vehicle parameters in determining fuel mass, which is essential for optimizing fuel efficiency and reducing fuel costs.
+
+
+
+## Exploratory Data Analysis
+
+### Following Correlation 
+This category exhibit a substantial correlation with "Fuel Mass," indicating a robust relationship with fuel consumption. These parameters are pivotal in comprehending and predicting fuel efficiency as they closely adhere to the expected behavior suggested by both correlation analysis and descriptive statistics. Their values significantly impact the amount of fuel consumed by the vehicle, making them crucial factors in assessing and optimizing fuel economy.
+
+#### Trip Based
+
+```{r echo=FALSE,results='hide',fig.keep='all'}
+
+dataset <- read.csv('dataset.csv', na.strings = "-")
+
+library(dplyr)
+library(gridExtra)
+# Trip Related Following Parameters
+trip_related_following_parameters <- c(
+  "Trip.average.KPL.kpl.",
+  "Trip.average.Litres.100.KM.l.100km."
+)
+
+# Create a list of plots
+plot_list <- lapply(trip_related_following_parameters, function(variable) {
+  dataset %>%
+    mutate(!!sym(variable) := ifelse(is.na(!!sym(variable)), 0, !!sym(variable))) %>%
+    mutate(bin = cut(!!sym(variable), breaks = 4)) %>%
+    ggplot(aes(x = bin, y = Fuel_mass)) +
+    geom_boxplot(fill = "blue") +
+    theme_minimal() +
+    xlab(paste(variable, " Bins"))
+})
+
+# Combine the plots into a 2x2 grid
+grid_of_plots <- grid.arrange(
+  grobs = plot_list,
+  ncol = 2)
+
+# Print or display the grid of plots
+grid_of_plots
+```
+
+<br>
+
+The analysis of the dataset highlights the reliability of key parameters in assessing fuel efficiency. "Litres Per 100 Kilometer (Long Term Average)" and "Trip Average KPL (kpl)" consistently mirror expected fuel efficiency trends, with lower values indicating better mileage. This reaffirms their significance as dependable fuel efficiency indicators.
+
+
+#### Environmental and Temperature related Paramters
+
+```{r echo=FALSE,results='hide',fig.keep='all'}
+#Environment and Temperature Related Following Paremeters
+
+environment_and_temperature_related_parameters <- c("CO..in.g.km..Average..g.km.","Engine.Coolant.Temperature..C.",
+                 "Intake.Air.Temperature..C.")
+
+# Create a list of plots
+plot_list <- lapply(environment_and_temperature_related_parameters, function(variable) {
+  dataset %>%
+    mutate(!!sym(variable) := ifelse(is.na(!!sym(variable)), 0, !!sym(variable))) %>%
+    mutate(bin = cut(!!sym(variable), breaks = 4)) %>%
+    ggplot(aes(x = bin, y = Fuel_mass)) +
+    geom_boxplot(fill = "blue") +
+    theme_minimal() +
+    xlab(paste(variable, " Bins"))
+})
+
+# Combine the plots into a 2x2 grid
+grid_of_plots <- grid.arrange(
+  grobs = plot_list,
+  ncol = 2  # You can adjust the number of columns as needed
+)
+
+# Print or display the grid of plots
+grid_of_plots
+```
+<br>
+
+Environmental and temperature-related parameters such as "CO₂ in g/km (Average)," "Engine Coolant Temperature (°C)," and "Intake Air Temperature (°C)" align with their descriptions. Lower CO₂ emissions, optimal engine coolant temperatures, and cooler intake air are linked to improved fuel efficiency, supported by the plot trends. These parameters play integral roles in influencing engine performance and emissions, underlining their impact on fuel efficiency.
+
+#### Voltage Related Parameters
+
+```{r echo=FALSE,results='hide',fig.keep='all'}
+
+voltage_related_parameters <- c("O2.Volts.Bank.1.sensor.1.V.")
+# Create a list of plots
+plot_list <- lapply(voltage_related_parameters, function(variable) {
+  dataset %>%
+    mutate(!!sym(variable) := ifelse(is.na(!!sym(variable)), 0, !!sym(variable))) %>%
+    mutate(bin = cut(!!sym(variable), breaks = 4)) %>%
+    ggplot(aes(x = bin, y = Fuel_mass)) +
+    geom_boxplot(fill = "blue") +
+    theme_minimal() +
+    xlab(paste(variable, " Bins"))
+})
+
+# Combine the plots into a 2x2 grid
+grid_of_plots <- grid.arrange(
+  grobs = plot_list,
+  ncol = 2  # You can adjust the number of columns as needed
+)
+
+grid_of_plots
+```
+<br>
+
+Voltage-related parameters, particularly "O2 Volts Bank 1 Sensor 1 (V)," accurately reflect the air-fuel mixture balance within the engine. The plots confirm that precise mixtures lead to enhanced fuel economy, reinforcing the sensor's importance in optimizing combustion for improved fuel efficiency.
+
+
+#### Throttle and Pedal Related Parameters
+```{r echo=FALSE,results='hide',fig.keep='all'}
+
+throttle_related <- c("Absolute.Throttle.Position.B...","Relative.Throttle.Position...","Accelerator.PedalPosition.D...","Accelerator.PedalPosition.E...","Throttle.Position.Manifold....")
+
+# Create a list of plots
+plot_list <- lapply(throttle_related, function(variable) {
+  dataset %>%
+    mutate(!!sym(variable) := ifelse(is.na(!!sym(variable)), 0, !!sym(variable))) %>%
+    mutate(bin = cut(!!sym(variable), breaks = 4)) %>%
+    ggplot(aes(x = bin, y = Fuel_mass)) +
+    geom_boxplot(fill = "blue") +
+    theme_minimal() +
+    xlab(paste(variable, " Bins"))
+})
+
+# Combine the plots into a 2x2 grid
+grid_of_plots <- grid.arrange(
+  grobs = plot_list,
+  ncol = 2  # You can adjust the number of columns as needed
+)
+
+# Print or display the grid of plots
+grid_of_plots
+
+```
+<br>
+
+Throttle and pedal-related parameters, including "Absolute Throttle Position B(%)," "Relative Throttle Position B(%)," "Accelerator Pedal Position D(%)," "Accelerator Pedal Position E(%)," and "Throttle Position (Manifold)," consistently align with their descriptions. These parameters effectively capture driver behavior and engine power output, providing valuable insights into vehicle operation and its impact on fuel consumption. Overall, the dataset's parameters prove reliable in assessing and optimizing fuel efficiency, essential in an era prioritizing environmental sustainability and cost-efficiency.
+
+
+
+### Not Following Correlation
+
+This category exhibit a significant correlation with "Fuel Mass," indicating a strong relationship with fuel consumption. These parameters are indeed influential in understanding and predicting fuel efficiency. However, it's worth noting that they do not entirely conform to the expected behavior suggested by the correlation and descriptive statistics. Despite their significant correlation, the relationship between these parameters and fuel consumption may involve complexities or dependencies on other variables that are not immediately apparent.
+
+#### Trip Related Parameters
+```{r echo=FALSE,results='hide',fig.keep='all'}
+trip_related_not_following_parameters <- c( "Run.time.since.engine.start.s.", "Speed..GPS..km.h.", "Speed..OBD..km.h.", "Km_per_liter")
+
+# Create a list of plots
+plot_list <- lapply(trip_related_not_following_parameters, function(variable) {
+  dataset %>%
+    mutate(!!sym(variable) := ifelse(is.na(!!sym(variable)), 0, !!sym(variable))) %>%
+    mutate(bin = cut(!!sym(variable), breaks = 4)) %>%
+    ggplot(aes(x = bin, y = Fuel_mass)) +
+    geom_boxplot(fill = "blue") +
+    theme_minimal() +
+    xlab(paste(variable, " Bins"))
+})
+
+# Combine the plots into a 2x2 grid
+grid_of_plots <- grid.arrange(
+  grobs = plot_list,
+  ncol = 2  # You can adjust the number of columns as needed
+)
+
+# Print or display the grid of plots
+grid_of_plots
+```
+
+<br>
+When analyzing the relationship between various parameters and fuel mass in a vehicle, it's essential to consider the dynamic and complex nature of these connections. Several trip-related parameters, such as "Run Time Since Engine Start (s)," "Speed (OBD) (km/h)," and "Speed (GPS) (km/h)," influence fuel consumption but in intricate ways that defy simple descriptive analysis.
+
+Run Time Since Engine Start (s):
+The "Run Time Since Engine Start (s)" column represents the duration of engine operation from the moment the engine is turned on. This parameter captures the warm-up phase of engine operation, where the engine operates in a less fuel-efficient mode, consuming more fuel per unit of time. Analyzing this variable descriptively may not yield straightforward insights because it encompasses a transient phase of engine operation influenced by cold start conditions.
+
+Speed (OBD) (km/h):
+"Speed (OBD) (km/h)" records vehicle speed as reported by the On-Board Diagnostics (OBD) system. While higher speeds generally lead to increased air resistance and fuel consumption, the relationship is non-linear. Factors like engine efficiency, vehicle weight, and vehicle-specific characteristics influence fuel consumption. Descriptive analysis may not capture the nuances of how speed influences fuel mass without accounting for these additional factors.
+
+Speed (GPS) (km/h):
+Similar to OBD-based speed, "Speed (GPS) (km/h)" measures vehicle speed but using GPS data. While higher speeds are associated with increased air resistance and potential fuel consumption, the relationship is complex and influenced by road conditions, terrain, and driving behavior. The precision and accuracy of GPS speed data can also vary, making it challenging to draw precise conclusions from this variable without considering these confounding factors
+
+
+#### Environment and Temperature Related Parameters
+```{r echo=FALSE,results='hide',fig.keep='all'}
+environment_and_temperature_related_not_following_parameters <- c("Barometric.pressure..from.vehicle..psi.", "Engine.Coolant.Temperature..C.", "Intake.Manifold.Pressure.psi.")
+# Create a list of plots
+plot_list <- lapply(environment_and_temperature_related_not_following_parameters, function(variable) {
+  dataset %>%
+    mutate(!!sym(variable) := ifelse(is.na(!!sym(variable)), 0, !!sym(variable))) %>%
+    mutate(bin = cut(!!sym(variable), breaks = 4)) %>%
+    ggplot(aes(x = bin, y = Fuel_mass)) +
+    geom_boxplot(fill = "blue") +
+    theme_minimal() +
+    xlab(paste(variable, " Bins"))
+})
+
+# Combine the plots into a 2x2 grid
+grid_of_plots <- grid.arrange(
+  grobs = plot_list,
+  ncol = 2  # You can adjust the number of columns as needed
+)
+
+# Print or display the grid of plots
+grid_of_plots
+```
+
+<br>
+
+Barometric Pressure (from vehicle) (psi):
+Barometric pressure represents the atmospheric pressure at the vehicle's location and affects the density of air entering the engine, which, in turn, impacts combustion efficiency and fuel consumption. However, this relationship is non-linear and depends on factors like engine design, fuel composition, and driving conditions. Descriptive analysis may not adequately capture the intricate interplay between barometric pressure and fuel mass.
+
+Engine Coolant Temperature (°C):
+Engine coolant temperature affects engine efficiency, but its impact on fuel mass is complex. Colder engines may be less fuel-efficient during warm-up but can become more efficient once they reach their optimal operating temperature. The specific effect depends on the engine's design and temperature range.
+
+Intake Manifold Pressure (psi):
+"Intake Manifold Pressure (psi)" influences combustion efficiency and fuel consumption. Higher pressures can improve combustion efficiency, but excessive pressures may increase fuel consumption. However, this relationship depends on various engine-specific factors, making descriptive analysis insufficient to understand its impact fully.
+
+
+#### Voltage Related Parameters
+
+```{r echo=FALSE,results='hide',fig.keep='all'}
+voltage_related_not_following_parameters <- c("Voltage..Control.Module..V.", "Voltage..OBD.Adapter..V.")
+
+# Create a list of plots
+plot_list <- lapply(voltage_related_not_following_parameters, function(variable) {
+  dataset %>%
+    mutate(!!sym(variable) := ifelse(is.na(!!sym(variable)), 0, !!sym(variable))) %>%
+    mutate(bin = cut(!!sym(variable), breaks = 4)) %>%
+    ggplot(aes(x = bin, y = Fuel_mass)) +
+    geom_boxplot(fill = "blue") +
+    theme_minimal() +
+    xlab(paste(variable, " Bins"))
+})
+
+# Combine the plots into a 2x2 grid
+grid_of_plots <- grid.arrange(
+  grobs = plot_list,
+  ncol = 2  # You can adjust the number of columns as needed
+)
+
+# Print or display the grid of plots
+print(grid_of_plots)
+```
+
+<br>
+
+Voltage (Control Module) (V):
+Stable voltage levels are essential for the reliable operation of fuel injection and ignition systems. Fluctuations in voltage can impact the precise operation of these systems, but the relationship is non-linear and complex, depending on voltage range, engine design, and other factors that affect fuel mass.
+
+Voltage (OBD Adapter) (V):
+Similar to control module voltage, OBD adapter voltage stability is crucial for data collection and communication between vehicle systems. Variations in OBD adapter voltage could impact data accuracy and, indirectly, fuel consumption. Descriptive analysis alone may not elucidate these subtleties without considering specific voltage levels and their consequences on fuel mass.
+
+
+#### Throttle and Pedal Related Parameters
+
+```{r echo=FALSE,results='hide',fig.keep='all'}
+
+throttle_related_not_following_parameters <- c("Absolute.Throttle.Position.B...", "Relative.Throttle.Position...","Throttle.Position.Manifold....")
+
+# Create a list of plots
+plot_list <- lapply(throttle_related_not_following_parameters, function(variable) {
+  dataset %>%
+    mutate(!!sym(variable) := ifelse(is.na(!!sym(variable)), 0, !!sym(variable))) %>%
+    mutate(bin = cut(!!sym(variable), breaks = 4)) %>%
+    ggplot(aes(x = bin, y = Fuel_mass)) +
+    geom_boxplot(fill = "blue") +
+    theme_minimal() +
+    xlab(paste(variable, " Bins"))
+})
+
+# Combine the plots into a 2x2 grid
+grid_of_plots <- grid.arrange(
+  grobs = plot_list,
+  ncol = 2  # You can adjust the number of columns as needed
+)
+
+# Print or display the grid of plots
+print(grid_of_plots)
+```
+
+<br>
+
+Throttle Position (Manifold) (%):
+Throttle position affects air intake and spark timing, which influence combustion efficiency and fuel consumption. The relationship between throttle position and fuel mass is intricate and dynamic, influenced by various factors, necessitating a more comprehensive investigation or modeling approach.
+
+Absolute Throttle Position B (%):
+Aggressive acceleration and high throttle positions typically result in elevated fuel consumption, but the connection between these parameters and fuel mass is complex. It depends on driver behavior, road conditions, and engine response, requiring a detailed analysis for precise quantification.
+
+Relative Throttle Position (%):
+Similar to absolute throttle position, relative throttle position influences fuel consumption, but its dynamic interaction with fuel mass involves various variables. Descriptive analysis provides an overview, but gaining a precise understanding necessitates a more nuanced analysis.
+
+
+## Methodology
+
+#### Conducting Clustering based on Fuel Mass Consumption for Recommendation
+```{r}
+X=read.csv("dataclusters.csv")
+data1=read.csv("datasetforclusters.csv")
+
+#install.packages("Rtsne")
+library(Rtsne)
+tsne_result <- Rtsne(X, dims = 2, perplexity = 3, theta = 0.5, check_duplicates = FALSE)
+
+X_embedded <- tsne_result$Y
+
+df1 <- data.frame(x = X_embedded[, 1], y = X_embedded[, 2])
+data1$Cluster <- as.factor(data1$Cluster)
+data1$cluster_6 <- as.factor(data1$cluster_6)
+data1$cluster_7 <- as.factor(data1$cluster_7)
+                             
+library(ggplot2)
+q1=ggplot(data1, aes(x = df1$x, y = df1$y)) +
+  geom_point() +
+  labs(title = "Distribution of embedded points", x = "x", y = "y")
+q2=ggplot(data1, aes(x = df1$x, y = df1$y,col=Cluster)) +
+  geom_point() +
+  labs(title = "Embedded points for 5 clusters", x = "x", y = "y")
+q3=ggplot(data1, aes(x = df1$x, y = df1$y,col=cluster_6)) +
+  geom_point() +
+  labs(title = "Embedded points for 6 clusters", x = "x", y = "y")
+q4=ggplot(data1, aes(x = df1$x, y = df1$y,col=cluster_7)) +
+  geom_point() +
+  labs(title = "Embedded points for 7 clusters", x = "x", y = "y")
+
+
+#wrap_plots(q1, q2, q3, q4)
+grid.arrange(q1, q2, q3, q4, ncol = 2)
+```
+
+```{r}
+data1=read.csv("datasetforclusters.csv")
+
+library(stats)
+library(cluster)
+library(ggplot2)
+library(Rtsne)
+
+X=read.csv("dataclusters.csv")
+install.packages("Rtsne")
+
+#tsne_result <- Rtsne(X, dims = 2, perplexity = 3, theta = 0.5, check_duplicates = FALSE)
+
+X_embedded <- tsne_result$Y
+
+data_for_clustering <- data.frame(x = X_embedded[, 1], y = X_embedded[, 2])
+
+df1 <- data.frame(x = X_embedded[, 1], y = X_embedded[, 2])
+
+
+
+kmeans_result <- kmeans(data_for_clustering, centers = 5, nstart = 20)
+ 
+
+data1$cluster <- kmeans_result$cluster
+data1$Cluster=as.factor(data1$Cluster)
+library(ggplot2)
+p1=ggplot(data1, aes(x = Fuel_mass, y = Cluster)) +
+  geom_boxplot(fill = "#66c2a5", color = "#7570b3") +
+  labs(title = "Fuel Mass Distribution by Cluster = 5", x = "Fuel Mass", y = "Cluster")
+
+kmeans_result1 <- kmeans(data_for_clustering, centers = 6, nstart = 20)
+data1$Cluster_6 <- kmeans_result1$cluster
+
+
+
+data1$cluster_6 <- as.factor(data1$cluster_6)
+
+library(ggplot2)
+p2=ggplot(data1,aes(x=Fuel_mass,y=cluster_6)) + geom_boxplot(fill = "#66c2a5", color = "#7570b3") + 
+  labs(title = "Fuel Mass across the Clusters = 6",
+       x = "Fuel Mass",
+       y = "Cluster") 
+kmeans_result2 <- kmeans(data_for_clustering, centers = 7, nstart = 20)
+data1$Cluster_7 <- kmeans_result2$Cluster
+
+
+
+data1$cluster_7 <- as.factor(data1$cluster_7)
+
+library(ggplot2)
+p3=ggplot(data1,aes(x=Fuel_mass,y=cluster_7)) + geom_boxplot(fill = "#66c2a5", color = "#7570b3") + 
+  labs(title = "Fuel Mass across the Clusters = 7",
+       x = "Fuel Mass",
+       y = "Cluster") 
+q4=ggplot(data1, aes(x = df1$x, y = df1$y,col=cluster_7)) +
+  geom_point() +
+  labs(title = "Embedded points for 7 clusters", x = "x", y = "y")
+
+
+
+library(gridExtra)
+
+
+grid.arrange(p1, p2, p3, ncol = 2)
+```
+<br>
+
+In our analysis of the distribution of fuel mass among clusters, we initially focused on a plot with five clusters. The fifth cluster stood out from the others due to its distinct segregation, and we identified it as exhibiting undesirable characteristics. Based on this, we made specific recommendations to address these issues.
+
+We then expanded our analysis to six clusters and observed an overlap between the fifth and third clusters, as well as between the second and first clusters. Further examination of the plot with seven clusters revealed overlapping patterns between clusters 5 and 4, 7 and 6, and 3 and 2. This lack of clear demarcation in both the six and seven-cluster scenarios makes it challenging to pinpoint a single cluster as a standout "bad cluster" for targeted recommendations.
+
+#### Solution Building
+
+![Solution Approach](C:\Users\ragha\OneDrive\Desktop\Data_science\Data_sciecne_project_1\Solution - Approach.png)
+<br>
+
+The methodology begins with the clustering of trips using the silhouette method, a popular technique for determining the optimal number of clusters. The silhouette method evaluates how well each data point fits within its assigned cluster compared to neighboring clusters, providing a measure of cluster quality. This step helps determine the most appropriate number of clusters for the dataset, ensuring that the resulting clusters are internally cohesive and well-separated.
+
+Once the trips are clustered, the next phase involves a detailed descriptive analysis to compare the right or left shift in fuel mass consumption among these clusters.
+
+The methodology begins with the understanding that Cluster 5 consumes more fuel than the rest of the clusters. As a result, the analysis focuses on comparing the other clusters against Cluster 5 to determine better confidence intervals based on whether the variables are directly or indirectly proportional to fuel mass.
+
+For variables that are directly proportional to fuel mass, we expect to observe a left shift in fuel consumption when they decrease. This is because less reading of the variable, which is directly linked to fuel mass, will result in lower fuel consumption. For example, a variable like CO..in.g.km..Average..g.km. is directly proportional to fuel consumption; as speed decreases, fuel consumption tends to decrease as well.
+
+Conversely, for variables that are indirectly proportional to fuel mass, we anticipate a right shift in fuel consumption as these variables increase. This is because more  reading of the variable indirectly linked to fuel mass would lead to lower fuel consumption. An example of an indirectly proportional variable is Engine.Coolant.Temperature..C.. Higher value of the variable results in lower fuel consumption as per the descriptive definition.
+
+To ensure the robustness of these findings, confidence intervals are calculated for the relevant parameters, helping to determine the statistical significance of the shifts observed in each cluster.
+
+In summary, this refined methodology not only identifies the shifts in fuel mass consumption but also delves into the specific variables contributing to these shifts, differentiating between those that are directly or indirectly proportional to fuel mass. This approach allows for precise recommendations tailored to each cluster's characteristics, ultimately enhancing fuel efficiency and reducing operational costs.
+
+## Implementation
+
+#### Trip Based
+
+```{r}
+library(kableExtra)
+library(knitr)
+data_pre = read.csv('dataset_2.csv')
+data_pre[is.na(data_pre)] <- 0
+data_pre$Cluster = as.character(data_pre$Cluster)
+
+plot_four_graphs <- function(data_pre, variable, recomm_cluster) {
+  #data_pre[is.na(data_pre)] <- 0
+  # 1st Graph
+  plot1 <- ggplot(data_pre, aes(x = Fuel_mass, y = Cluster)) +
+    geom_boxplot(fill = "#66c2a5", color = "#7570b3") +
+    labs(
+      title = "Fuel Mass across the Clusters",
+      x = "Fuel Mass",
+      y = "Cluster"
+    ) +
+    theme_minimal()
+  
+  # 2nd Graph
+  plot2 <- ggplot(data_pre, aes(x = data_pre[,c(variable)], y = Cluster)) +
+    geom_boxplot(fill = "#66c2a5", color = "#7570b3") +
+    labs(
+      title = variable,
+      x = variable,
+      y = "Cluster"
+    ) +
+    theme_minimal()
+  
+  # 3rd Graph
+  data_pre_c <- data_pre[data_pre$Cluster == recomm_cluster | data_pre$Cluster == "5",]
+
+  # Density Plot
+  plot3 <- ggplot(data_pre_c, aes(x = data_pre_c[,c(variable)], fill = Cluster)) +
+    geom_density(alpha = 0.4) +
+    labs(
+      title = paste("Density Plots across Clusters"),
+      x = variable,
+      y = "Density"
+    ) +
+    theme_minimal()
+  
+  ci_list <- list()
+  confidence_level <- 0.95
+  
+  for (cluster_id in unique(data_pre$Cluster)) {
+    subset_data <- data_pre[data_pre$Cluster == cluster_id,]
+    
+    t_test_result <- t.test(subset_data[,c(variable)], conf.level = confidence_level , na.rm = TRUE)
+    ci <- t_test_result$conf.int
+    
+  
+    ci_list[[as.character(cluster_id)]] <- ci
+  }
+  
+  # print(ci_list)
+  
+  # 4th Graph
+  ci_df <- data.frame(
+    Cluster = as.numeric(names(ci_list)),
+    Lower = sapply(ci_list, "[[", 1),
+    Upper = sapply(ci_list, "[[", 2)
+  )
+  
+  
+  plot4 <- ggplot(ci_df, aes(x = factor(Cluster), y = (Lower + Upper) / 2)) +
+    geom_point(size = 3) +
+    geom_errorbar(aes(ymin = Lower, ymax = Upper), width = 0.2) +
+    labs(
+      title = "Confidence Intervals by Clusters",
+      x = "Cluster",
+      y = variable
+    ) +
+    theme_minimal()
+  
+  # Arrange the four plots in a 2x2 grid
+  grid.arrange(plot1, plot2, plot3, plot4, ncol = 2)
+}
+
+dataset[is.na(dataset)] <- 0
+dataset$Cluster = as.character(dataset$Cluster)
+variable = "Trip.average.KPL.kpl."
+recomm_cluster = "2"
+data1$Cluster = as.character(data1$Cluster)
+
+plot_four_graphs(data1, variable, recomm_cluster)
+```
+<br>
+
+
+The Trip Average KPL (kilometers per liter) parameter is crucial for assessing a vehicle's fuel efficiency, quantifying how far it can travel on one liter of fuel. When analyzing data, considering confidence intervals (CI) is vital. Cluster 5 has a CI of 11.81 - 12.15, suggesting its average KPL falls within this range. In contrast, Cluster 2 has a wider CI of 12.97240 - 13.21055, indicating a higher average KPL. Higher KPL signifies better fuel efficiency, making Cluster 2 more efficient. This insight is valuable for individuals and fleet managers seeking to optimize vehicle performance and reduce fuel costs. It underlines the importance of the Trip Average KPL parameter in fuel efficiency assessment.
+
+```{r}
+variable = "Trip.average.Litres.100.KM.l.100km."
+recomm_cluster = "2"
+data1$Cluster = as.character(data1$Cluster)
+
+plot_four_graphs(data1, variable, recomm_cluster)
+```
+<br>
+
+"Litres Per 100 Kilometer (Long Term Average)" is a fundamental parameter for assessing vehicle fuel efficiency, measuring fuel consumption over a specific distance. Lower values signify enhanced efficiency. The analysis focuses on "Cluster 5" and "Cluster 2," each with distinct confidence intervals (CI).
+In "Cluster 5," the CI for long-term average fuel consumption is [8.41 - 8.80], while "Cluster 2" features a narrower CI of [7.62 - 7.95], indicating higher confidence in its lower fuel consumption.
+While it's not ideal for direct recommendations, this analysis offers a valuable benchmark for better fuel efficiency. Understanding the distinction between these clusters aids individuals, organizations, and fleet managers in optimizing fuel consumption and operational costs, underlining the significance of fuel efficiency in vehicle performance.
+
+
+#### Environment and Temperature Related
+
+```{r}
+
+environment_and_temperature_related_parameters <- c("CO..in.g.km..Average..g.km.","Engine.Coolant.Temperature..C.",
+                 "Intake.Air.Temperature..C.")
+
+variable = "CO..in.g.km..Average..g.km."
+recomm_cluster = "2"
+data1$Cluster = as.character(data1$Cluster)
+
+plot_four_graphs(data1, variable, recomm_cluster)
+```
+<br>
+
+"CO₂ in g/km (Average)" is a critical metric for evaluating a vehicle's fuel efficiency and environmental impact. Lower CO₂ emissions signify superior fuel efficiency, indicating efficient fuel consumption and reduced greenhouse gas emissions. In "Cluster 5," the confidence interval for average CO₂ emissions is [218 - 220], while "Cluster 2" features a narrower CI of [213 - 215], reflecting higher confidence in its low emissions. This analysis strongly recommends "Cluster 2" for its superior fuel efficiency and lower CO₂ emissions. It's crucial for eco-conscious individuals, organizations, and policymakers, emphasizing the significance of fuel efficiency and sustainability.
+
+```{r}
+environment_and_temperature_related_parameters <- c("CO..in.g.km..Average..g.km.","Engine.Coolant.Temperature..C.",
+                 "Intake.Air.Temperature..C.")
+
+variable = "Engine.Coolant.Temperature..C."
+recomm_cluster = "2"
+data1$Cluster = as.character(data1$Cluster)
+
+plot_four_graphs_2 <- function(data_pre, variable, recomm_cluster) {
+  #data_pre[is.na(data_pre)] <- 0
+  data_pre <- data_pre[data_pre$Engine.Coolant.Temperature..C. != 0, ]
+  # 1st Graph
+  plot1 <- ggplot(data_pre, aes(x = Fuel_mass, y = Cluster)) +
+    geom_boxplot(fill = "#66c2a5", color = "#7570b3") +
+    labs(
+      title = "Fuel Mass across the Clusters",
+      x = "Fuel Mass",
+      y = "Cluster"
+    ) +
+    theme_minimal()
+  
+  # 2nd Graph
+  plot2 <- ggplot(data_pre, aes(x = data_pre[,c(variable)], y = Cluster)) +
+    geom_boxplot(fill = "#66c2a5", color = "#7570b3") +
+    labs(
+      title = variable,
+      x = variable,
+      y = "Cluster"
+    ) +
+    theme_minimal()
+  
+  # 3rd Graph
+  data_pre_c <- data_pre[data_pre$Cluster == recomm_cluster | data_pre$Cluster == "5",]
+
+  # Density Plot
+  plot3 <- ggplot(data_pre_c, aes(x = data_pre_c[,c(variable)], fill = Cluster)) +
+    geom_density(alpha = 0.4) +
+    labs(
+      title = paste("Density Plots across Clusters"),
+      x = variable,
+      y = "Density"
+    ) +
+    theme_minimal()
+  
+  ci_list <- list()
+  confidence_level <- 0.95
+  data_pre <- data_pre[data_pre$Engine.Coolant.Temperature..C. != 0, ]
+  for (cluster_id in unique(data_pre$Cluster)) {
+    subset_data <- data_pre[data_pre$Cluster == cluster_id,]
+    
+    t_test_result <- t.test(subset_data[,c(variable)], conf.level = confidence_level , na.rm = TRUE)
+    ci <- t_test_result$conf.int
+    
+  
+    ci_list[[as.character(cluster_id)]] <- ci
+  }
+  
+  
+  
+  # 4th Graph
+  ci_df <- data.frame(
+    Cluster = as.numeric(names(ci_list)),
+    Lower = sapply(ci_list, "[[", 1),
+    Upper = sapply(ci_list, "[[", 2)
+  )
+  
+  
+  plot4 <- ggplot(ci_df, aes(x = factor(Cluster), y = (Lower + Upper) / 2)) +
+    geom_point(size = 3) +
+    geom_errorbar(aes(ymin = Lower, ymax = Upper), width = 0.2) +
+    labs(
+      title = "Confidence Intervals by Clusters",
+      x = "Cluster",
+      y = variable
+    ) +
+    theme_minimal()
+  
+  # Arrange the four plots in a 2x2 grid
+  grid.arrange(plot1, plot2, plot3, plot4, ncol = 2)
+}
+
+
+plot_four_graphs_2(data1, variable, recomm_cluster)
+```
+<br>
+
+Engine Coolant Temperature (°C) is pivotal for assessing fuel efficiency and engine performance. A properly warmed engine operates efficiently, enhancing fuel economy. Comparing Cluster 5 and Cluster 2, Cluster 5's temperature range is [88.1 - 88.5], and Cluster 2 has a slightly wider range of [88.8 - 89.0], with higher confidence. While this suggests Cluster 2 maintains more efficient temperatures, the limited data variation makes it challenging to recommend decisively. Nevertheless, it underscores the importance of engine temperature control for improved fuel efficiency and performance. Further data variability is essential for stronger conclusions.
+
+```{r}
+environment_and_temperature_related_parameters <- c("CO..in.g.km..Average..g.km.","Engine.Coolant.Temperature..C.",
+                 "Intake.Air.Temperature..C.")
+
+variable = "Intake.Air.Temperature..C."
+recomm_cluster = "1"
+data1$Cluster = as.character(data1$Cluster)
+
+plot_four_graphs(data1, variable, recomm_cluster)
+```
+<br>
+Intake Air Temperature (°C) is a critical parameter for evaluating vehicle fuel efficiency and engine performance. This temperature directly influences the combustion process, affecting air density and oxygen content in the engine intake manifold.
+In Cluster 1, with a confidence interval of [34.6 - 35.7], cooler air leads to denser, oxygen-rich intake air, potentially enhancing combustion efficiency, engine performance, and fuel economy. The narrower confidence interval in Cluster 1 signifies consistently maintaining this beneficial temperature range.
+This recommendation is clear: optimizing intake air temperature akin to Cluster 1 can significantly improve fuel efficiency and engine performance. Regular air intake system maintenance and temperature control are essential, along with fuel-efficient driving practices. This analysis underscores the importance of maintaining optimal intake air temperatures for peak combustion efficiency and substantial fuel savings.
+
+
+#### Voltage Related Parameters
+
+<br>
+
+#####  O2.Volts.Bank.1.sensor.1.V. <= 0.45
+
+```{r}
+data1_temp = data1[data1$O2.Volts.Bank.1.sensor.1.V. <= 0.45,]
+data1_temp[is.na(data1_temp)] <- 0
+data1_temp2 = data1[data1$O2.Volts.Bank.1.sensor.1.V. > 0.45,]
+data1_temp2[is.na(data1_temp2)] <- 0
+
+voltage_related_parameters <- c("O2.Volts.Bank.1.sensor.1.V.")
+
+variable = "O2.Volts.Bank.1.sensor.1.V."
+recomm_cluster = "1"
+data1$Cluster = as.character(data1$Cluster)
+
+plot_four_graphs(data1_temp, variable, recomm_cluster)
+```
+<br>
+
+#####  O2.Volts.Bank.1.sensor.1.V. > 0.45
+
+
+```{r}
+data1_temp = data1[data1$O2.Volts.Bank.1.sensor.1.V. <= 0.45,]
+data1_temp[is.na(data1_temp)] <- 0
+data1_temp2 = data1[data1$O2.Volts.Bank.1.sensor.1.V. > 0.45,]
+data1_temp2[is.na(data1_temp2)] <- 0
+
+voltage_related_parameters <- c("O2.Volts.Bank.1.sensor.1.V.")
+
+variable = "O2.Volts.Bank.1.sensor.1.V."
+recomm_cluster = "4"
+data1$Cluster = as.character(data1$Cluster)
+
+plot_four_graphs(data1_temp2, variable, recomm_cluster)
+```
+<br>
+
+The analysis of O2 Volts Bank 1 Sensor 1 (V) in both Cluster 5 and Cluster 1 for O2 Volts Bank 1 Sensor 1 (V) <= 4.5, and similarly in Cluster 5 and Cluster 4 for O2 Volts Bank 1 Sensor 1 (V) > 4.5 reveals insightful data. However, crafting precise recommendations solely from this information is challenged by consistent driving behavior. In situations where O2 Volts Bank 1 Sensor 1 (V) <= 4.5, narrow confidence intervals are exhibited by both clusters, indicating consistent air-fuel mixture regulation and likely improved fuel economy. Conversely, when O2 Volts Bank 1 Sensor 1 (V) > 4.5, the intervals are broadened slightly, still suggesting effective air-fuel mixture management. To offer more accurate recommendations, a broader set of parameters reflecting various aspects of driving behavior and engine performance should be considered, enabling a comprehensive understanding of fuel efficiency and more effective optimization strategies.
+
+#### Throttle and Pedal Related Paramters
+
+```{r}
+throttle_related <- c("Absolute.Throttle.Position.B...","Relative.Throttle.Position...","Accelerator.PedalPosition.D...","Accelerator.PedalPosition.E...","Throttle.Position.Manifold....")
+
+
+variable = "Absolute.Throttle.Position.B..."
+recomm_cluster = "4"
+data1$Cluster = as.character(data1$Cluster)
+
+plot_four_graphs(data1, variable, recomm_cluster)
+```
+
+
+
+
+```{r}
+throttle_related <- c("Absolute.Throttle.Position.B...","Relative.Throttle.Position...","Accelerator.PedalPosition.D...","Accelerator.PedalPosition.E...","Throttle.Position.Manifold....")
+
+
+variable = "Relative.Throttle.Position..."
+recomm_cluster = "4"
+data1$Cluster = as.character(data1$Cluster)
+
+plot_four_graphs(data1, variable, recomm_cluster)
+```
+
+
+
+
+```{r}
+throttle_related <- c("Absolute.Throttle.Position.B...","Relative.Throttle.Position...","Accelerator.PedalPosition.D...","Accelerator.PedalPosition.E...","Throttle.Position.Manifold....")
+
+
+variable = "Accelerator.PedalPosition.D..."
+recomm_cluster = "4"
+data1$Cluster = as.character(data1$Cluster)
+
+plot_four_graphs(data1, variable, recomm_cluster)
+```
+
+
+
+```{r}
+throttle_related <- c("Absolute.Throttle.Position.B...","Relative.Throttle.Position...","Accelerator.PedalPosition.D...","Accelerator.PedalPosition.E...","Throttle.Position.Manifold....")
+
+
+variable = "Accelerator.PedalPosition.E..."
+recomm_cluster = "4"
+data1$Cluster = as.character(data1$Cluster)
+
+plot_four_graphs(data1, variable, recomm_cluster)
+```
+
+
+
+```{r}
+throttle_related <- c("Absolute.Throttle.Position.B...","Relative.Throttle.Position...","Accelerator.PedalPosition.D...","Accelerator.PedalPosition.E...","Throttle.Position.Manifold....")
+
+
+variable = "Throttle.Position.Manifold...."
+recomm_cluster = "4"
+data1$Cluster = as.character(data1$Cluster)
+
+
+
+
+plot_four_graphs(data1, variable, recomm_cluster)
+```
+
+Analyzing throttle and pedal positions in "Cluster 4" and "Cluster 5" reveals the critical connection between driver behavior, engine power control, and fuel consumption. In "Cluster 4," tight confidence intervals indicate consistent, moderate throttle and pedal usage, showcasing how drivers manage power and acceleration. Conversely, "Cluster 5" exhibits wider intervals, signifying greater variability in driver behaviors, potentially leading to more aggressive acceleration and higher throttle and pedal positions.
+These insights underscore the pivotal role of driver actions in fuel consumption. More aggressive acceleration and maintaining high positions demand increased fuel injection, significantly impacting fuel economy. Consequently, a vehicle's fuel efficiency is largely shaped by how drivers handle these inputs.
+
+These findings emphasize that drivers can influence fuel economy by adopting smoother acceleration and avoiding excessive throttle and pedal use, akin to "Cluster 4." This approach not only saves on fuel costs but also aligns with eco-conscious driving, reducing emissions and promoting responsible driving practices.
+In conclusion, understanding how driver behaviors affect engine power and fuel consumption is vital for individuals and organizations aiming to optimize fuel efficiency and reduce their carbon footprint. Prioritizing balanced and controlled acceleration leads to improved fuel efficiency, cost savings, and eco-friendly driving practices.
+
+
+## Results
+
+<br>
+
+![Result Table](C:\Users\ragha\OneDrive\Desktop\Data_science\Data_sciecne_project_1\Result_table.png)
+<br>
+
+
+#### Trip-Related Parameters
+Two essential parameters, "Trip Average KPL" and "Litres Per 100 Kilometer (Long Term Average)," shed light on fuel efficiency within the clusters. In the case of "Trip Average KPL," "Cluster 2" outperforms "Cluster 5," with higher values indicating superior fuel efficiency. "Cluster 2" covers more distance per liter of fuel, making it a benchmark for fuel economy. Similarly, "Cluster 2" excels in "Litres Per 100 Kilometer," indicating that it consumes less fuel to cover the same distance. This information is vital for reducing fuel costs and improving overall fuel efficiency.
+
+#### Environment and Temperature-Related Parameters
+
+Examining parameters like "CO₂ in g/km (Average)," "Engine Coolant Temperature (°C)," and "Intake Air Temperature (°C)" within "Cluster 5" and "Cluster 2" reveals insights into environmental impact and vehicle performance. "Cluster 2" consistently outperforms "Cluster 5" in CO₂ emissions, maintaining narrower confidence intervals and lower emissions per kilometer. This highlights the potential for reducing the carbon footprint through fuel-efficient practices and technologies. "Cluster 2" also maintains more efficient engine coolant temperatures, which can lead to better fuel economy. Moreover, the intake air temperature is more consistent in "Cluster 2," enhancing combustion efficiency and potentially improving fuel efficiency. These insights are invaluable for individuals and organizations aiming to reduce their environmental impact and optimize fuel efficiency.
+
+#### Voltage-Related Parameters
+The analysis of "O2 Volts Bank 1 Sensor 1 (V)" within "Cluster 5" and "Cluster 1" for values "less than or equal to 4.5" and "Cluster 5" and "Cluster 4" for values "greater than 4.5" provides insights into fuel efficiency. Although confidence intervals are narrower, these findings also suggest uniform driving behaviors and engine management strategies within the clusters. However, it's essential to consider a broader set of parameters related to driving behavior and engine performance to make precise recommendations for optimizing fuel efficiency.
+A holistic approach that combines insights from O2 sensor voltages with additional parameters such as throttle position, acceleration sensor readings, and engine load will offer a more comprehensive understanding of fuel efficiency in different driving contexts. By considering a wider range of factors, recommendations can be tailored to address the full spectrum of influences on fuel efficiency effectively.
+
+#### Throttle and Pedal-Related Parameters
+Analyzing various throttle and pedal position parameters within "Cluster 4" and "Cluster 5" highlights the significant role of driver behavior in shaping engine power and fuel consumption. "Cluster 4" exhibits narrower confidence intervals, suggesting a more consistent range of values, reflecting a more conservative approach to throttle usage. In contrast, "Cluster 5" displays broader confidence intervals, indicating greater variability and potentially more aggressive acceleration.
+The practical significance of these findings is that drivers have a substantial influence on their vehicle's fuel efficiency through their control of throttle and pedal positions. A more conservative approach to acceleration, as observed in "Cluster 4," can lead to better fuel economy, fuel cost savings, and reduced environmental impact.
+
+
+In summary, this comprehensive analysis of various vehicle parameters within "Cluster 4" and "Cluster 5" underscores the vital role of driver behavior in shaping engine power, fuel consumption, and environmental impact. These insights are invaluable for individuals and organizations looking to optimize their vehicles' fuel economy, reduce their carbon footprint, and promote responsible driving practices. The importance of adopting a balanced and controlled approach to acceleration is emphasized, ultimately leading to improved fuel efficiency and environmentally conscious driving practices. These findings offer a robust foundation for making informed decisions in the realm of transportation and vehicle management, aligning with sustainability and efficiency goals.
+
+
+
+## References
+
+[@weinan2020]
+
+[@yeow2021]
+

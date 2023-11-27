@@ -73,13 +73,15 @@ In essence, VED's inclusion of diverse vehicle types, coupled with its comprehen
 
 Given the extensive and diverse nature of the Vehicle Energy Dataset (VED), encompassing various vehicle types and driving conditions across seasons and terrains, our project aims to leverage this wealth of information to analyze and optimize vehicle energy usage. In pursuit of our goal to develop an engine recommendation system, we are now focusing on comparing other clusters (termed as fleets) within the dataset to identify similarities with 'fleet1,' the cluster exhibiting suboptimal performance in Air Flow Rate. This comparative analysis will provide valuable insights into the diverse behaviors across different vehicle groups, facilitating our efforts to enhance driving efficiency and offer actionable guidance to drivers.
 
-We are engaged in a project titled "Monitoring Vehicles Health," aiming to develop an engine recommendation system. Our focus is on utilizing distinct machine learning models to provide actionable guidance to drivers, helping them optimize Air Flow Rate while on the road.
+Our project, "Monitoring Vehicles Health," centers on developing an engine recommendation system using diverse machine learning models. The primary objective is to guide drivers in optimizing Air Flow Rate while driving. Our dataset consists of distinct groups initially, which were further segmented into clusters or labels based on inherent patterns and behaviors.
 
-In our dataset, which comprises multiple distinct groups of data, we initially categorized the data into corresponding groups. Employing K-means clustering, we further segmented each group to form distinct clusters or labels.
+Upon analyzing the clustered dataset using boxplots, intriguing patterns emerged. Specifically, certain clusters like 'KA_BB', 'KA_RT', and 'S_KA' displayed nearly identical mean values. Similarly, clusters such as 'KA_KA', 'S_S', and 'RT_S', along with 'BB_RT', 'RT_RT', and 'S_CW', showcased similar characteristics.
 
-During our analysis, an intriguing observation emerged when examining the clustered dataset using boxplots. Specifically, we noticed that certain clusters within the dataset, namely 'KA_BB', 'KA_RT', 'S_KA', exhibited nearly identical means, as did clusters like 'KA_KA', 'S_S', and 'RT_S', 'BB_RT', and 'RT_RT', 'S_CW'.
+To streamline our analysis, we merged clusters with similar behavior, resulting in the formation of four distinct clusters: 'fleet1', 'fleet2', 'fleet3', and 'fleet4'. Notably, 'fleet1' demonstrated the least favorable performance when examining the 'Air_Flow_Rate_from_Mass_Flow_Sensor_g_s' column (y_label).
 
-To streamline our analysis, we merged these clusters exhibiting similar behavior, leading to the creation of four new clusters: 'fleet1', 'fleet2', 'fleet3', and 'fleet4'. Upon investigating these clusters' behavior concerning the 'Air_Flow_Rate_from_Mass_Flow_Sensor_g_s' column (y_label), we observed that 'fleet1' demonstrated the poorest performance. Consequently, we conducted a detailed analysis specifically focused on 'fleet1' to establish a benchmark before proceeding with our main objectives.
+Hence, we conducted a detailed analysis on the fleets. This detailed examination aims to understand the contributing factors influencing the performance of fleets and lays the groundwork for optimizing strategies within our engine recommendation system.
+
+Our overarching aim remains centered on utilizing machine learning models to provide actionable insights to drivers, empowering them to optimize Air Flow Rate for enhanced vehicle performance and health maintenance while on the road.
 
 ### Problem Statement:
 
@@ -244,42 +246,22 @@ call_ANOVA <- function(data, target_variable, columns_to_process) {
 call_ANOVA(fleet3, "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s", columns_to_process)
 ```
 
+**Interpretations:**
+***Engine_Coolant_Temperature_degreesC***
+**Df (Degrees of Freedom):** 1 (Between groups), 32350 (Within groups)
+**Sum Sq (Sum of Squares):** Between groups: 8006, Within groups: 3072923
+**F value:** 84.3
+**Pr(>F):** p-value is significantly less than 0.05 (given as <2e-16), indicating a statistically significant difference between groups.
 
+This suggests that the variable "Engine_Coolant_Temperature_degreesC" significantly affects the "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+Intake_Manifold_Absolute_Pressure_kPa, Engine_RPM_RPM, Vehicle_Speed_Sensor_km_h, Intake_Air_Temperature_degreesC, Absolute_Throttle_Position_, Ambient_Air_Temperature_degreesC, Accelerator_Pedal_Position_D_, Accelerator_Pedal_Position_E_, Engine_Coolant_Temperature_A_degreesC
+For all these variables, the ANOVA tests show extremely low p-values (<2e-16), indicating significant differences between groups. These variables are also likely to have a significant impact on the target variable "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+***Intake_Air_Temperature_A_degreesC***
+The p-value (0.22) for this variable is greater than 0.05, suggesting that there isn't sufficient evidence to conclude a significant impact of "Intake_Air_Temperature_A_degreesC" on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
 
 **Now we will bin for both the target and independent variables**
-
-```{r}
-# Binning the target variable and columns to process
-data_binned <- data %>%
-  mutate(target_bin = cut(!!sym(target_variable), breaks = 4))
-
-for (col in columns_to_process) {
-  if (is.numeric(data[[col]])) {
-    data_binned <- data_binned %>%
-      mutate(!!sym(paste0(col, "_bin")) := cut(!!sym(col), breaks = 4))
-  } else {
-    data_binned[[col]] <- as.factor(data_binned[[col]])
-  }
-}
-
-# Creating boxplots for each column vs. the binned target variable
-plot_list <- list()
-for (col in columns_to_process) {
-  p <- ggplot(data_binned, aes_string(x = paste0(col, "_bin"), y = target_variable)) +
-    geom_boxplot(fill = "#69b3a2") +
-    theme_minimal() +
-    xlab(col) +
-    ylab(target_variable) +
-    ggtitle(paste("Boxplot of", col, "vs", target_variable))
-  
-  plot_list[[col]] <- p
-}
-
-# Display the boxplots
-for (i in 1:length(plot_list)) {
-  print(plot_list[[i]])
-}
-```
 
 ```{r}
 plot_binned_variables <- function(dataset, columns_to_process, target_variable) {

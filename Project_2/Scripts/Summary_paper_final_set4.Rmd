@@ -1,0 +1,314 @@
+---
+title: "Monitoring Engine Health Through Better Air Flow Rate"
+date: "2023-11-25"
+bibliography: "bibliography.bib"
+output: 
+  html_document:
+    theme: journal
+    code_folding: hide
+    number_sections: FALSE
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+author: 
+  - name          : "Raghav Agarwal"
+    affiliation   : "1"
+    corresponding : yes
+    address       : "Arlington,VA"
+    email         : "raghav.agarwal@gwu.edu"
+    role: 
+      - "Descriptive Analysis"
+      - "Solution Building"
+      - "Project 2 Proposal"
+  - name          : "Harshavardana Reddy Kolan"
+    affiliation   : "2"
+    corresponding : no    # Define only one corresponding author
+    address       : "Fairfax,VA"
+    email         : "harshavardanareddy.kolan@gwu.edu"
+    role:
+      - "Descriptive Analysis"
+      - "Solution Building"
+      - "Clustering based on Fuel Mass"
+      
+  - name          : "Shikha Kumari"
+    affiliation   : "3"
+    corresponding : no
+    address       : "Arlington,VA"
+    email         : "shikha.kumari@gwu.edu"
+    role: 
+      - "Creation of Label Column"
+      - "Segregation of following and not-following parameters"
+      - "Analysis of C.I. for Environment and Temperature related parameters"
+      
+  - name          : "Sanjayram Raja Srinivasan"
+    affiliation   : "4"
+    corresponding : no    # Define only one corresponding author
+    address       : "Arlington,VA"
+    email         : "sanjayram.rajasrinivasan@gwu.edu"
+    role: 
+      - "Segregation of Following and Not Following Parameters"
+      - "Analysis of Trip related parameters"
+
+affiliation:
+  - id            : "1 , 2 , 3 , 4"
+    institution   : "The George Washington University"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = F, message = F)
+```
+
+## About the Data
+
+The Vehicle Energy Dataset (VED), utilized in our project, stands as a significant contribution to understanding vehicle behavior and energy consumption patterns, encompassing a vast array of data collected from 383 personal cars in Ann Arbor, Michigan. This comprehensive open dataset contains detailed GPS trajectories alongside time-series data on fuel, energy, speed, and auxiliary power usage.
+
+The breadth and depth of the Vehicle Energy Dataset (VED) are underscored by its inclusion of various vehicle types, providing a comprehensive view of the automotive landscape. Within this dataset, the presence of 264 gasoline vehicles, 92 hybrid electric vehicles (HEVs), and 27 plug-in hybrid/electric vehicles (PHEV/EVs) offers an expansive spectrum for analysis. These distinct vehicle categories inherently possess diverse energy consumption patterns and driving behaviors, forming a rich tapestry of information essential for comparative studies and nuanced insights into the energy dynamics across different vehicle technologies.
+
+VED's temporal scope, spanning from November 2017 to November 2018, encapsulates a full year of driving experiences. This duration encompasses a wide array of seasons, from the crisp days of fall to the snowy winters and the bloom of spring, presenting an invaluable opportunity to observe how driving conditions fluctuate throughout the year. Moreover, the dataset's documentation of real-world driving scenarios offers a comprehensive glimpse into diverse terrains, from urban sprawls with congested traffic to highways with varying speed limits, thereby capturing the complexities of driving environments that directly impact energy consumption and efficiency.
+
+The accumulation of 374,000 miles within this timeframe signifies not just a vast quantity of data but a rich repository of real-world driving experiences. Each mile logged in the dataset represents a unique journey, a distinct set of driving behaviors, and energy usage patterns. This extensive mileage contributes to the dataset's robustness, providing a substantial foundation for conducting in-depth analyses and deriving statistically significant conclusions regarding vehicle energy consumption and performance across different driving contexts and vehicle types.
+
+In essence, VED's inclusion of diverse vehicle types, coupled with its comprehensive coverage of driving conditions across seasons and terrains, alongside the substantial mileage accumulated, positions it as a goldmine for researchers and practitioners seeking to explore, understand, and optimize vehicle energy usage and behavior. This depth and diversity pave the way for multifaceted analyses and innovative solutions aimed at enhancing the efficiency and sustainability of future automotive technologies.
+
+Given the extensive and diverse nature of the Vehicle Energy Dataset (VED), encompassing various vehicle types and driving conditions across seasons and terrains, our project aims to leverage this wealth of information to analyze and optimize vehicle energy usage. In pursuit of our goal to develop an engine recommendation system, we are now focusing on comparing other clusters (termed as fleets) within the dataset to identify similarities with 'fleet1,' the cluster exhibiting suboptimal performance in Air Flow Rate. This comparative analysis will provide valuable insights into the diverse behaviors across different vehicle groups, facilitating our efforts to enhance driving efficiency and offer actionable guidance to drivers.
+
+Our project, "Monitoring Vehicles Health," centers on developing an engine recommendation system using diverse machine learning models. The primary objective is to guide drivers in optimizing Air Flow Rate while driving. Our dataset consists of distinct groups initially, which were further segmented into clusters or labels based on inherent patterns and behaviors.
+
+Upon analyzing the clustered dataset using boxplots, intriguing patterns emerged. Specifically, certain clusters like 'KA_BB', 'KA_RT', and 'S_KA' displayed nearly identical mean values. Similarly, clusters such as 'KA_KA', 'S_S', and 'RT_S', along with 'BB_RT', 'RT_RT', and 'S_CW', showcased similar characteristics.
+
+To streamline our analysis, we merged clusters with similar behavior, resulting in the formation of four distinct clusters: 'fleet1', 'fleet2', 'fleet3', and 'fleet4'. Notably, 'fleet1' demonstrated the least favorable performance when examining the 'Air_Flow_Rate_from_Mass_Flow_Sensor_g_s' column (y_label).
+
+Hence, we conducted a detailed analysis on the fleets. This detailed examination aims to understand the contributing factors influencing the performance of fleets and lays the groundwork for optimizing strategies within our engine recommendation system.
+
+Our overarching aim remains centered on utilizing machine learning models to provide actionable insights to drivers, empowering them to optimize Air Flow Rate for enhanced vehicle performance and health maintenance while on the road.
+
+### Problem Statement:
+
+Our primary focus now lies in analyzing the remaining clusters (referred to as fleets) to discern which among them exhibits similarities to 'fleet1', the underperforming cluster identified earlier. This comparison will enable us to draw insights and further understand the similarities and differences between the fleet clusters, aiding us in addressing our project goals effectively.
+
+### Parametric Description:
+
+**Intake Manifold Absolute Pressure [kPa]:** refers to the atmospheric pressure within the engine's intake manifold, measured in kilopascals. It signifies the pressure level crucial for optimizing fuel-air mixture, influencing engine performance and efficiency.
+
+**Engine RPM(rpm):** This indicates how fast the engine is spinning. It's crucial for understanding engine performance and fuel consumption, as higher RPMs often mean higher fuel consumption.
+
+**Vehicle Speed Sensor [km/h]:** measures the speed of a vehicle in kilometers per hour. It provides real-time data on the vehicle's movement, essential for monitoring speed, navigation, and analyzing driving behavior or performance.
+
+**Accelerator Pedal Position D(%) and Accelerator Pedal Position E(%):** These show the percentage of depression of the accelerator pedal. It helps in understanding driver behavior and how aggressively the vehicle is being driven.
+
+**Engine Coolant Temperature (°C):** It indicates the temperature of the engine coolant, which is important for engine performance and efficiency.
+
+**Intake Air Temperature(°C):** This measures the temperature of the air entering the engine. Cooler air is denser, which can affect combustion efficiency and fuel consumption.
+
+**Absolute Throttle Position B(%):** This is the percentage at which the throttle is open. It's important because it shows how much power the engine is producing relative to its maximum capacity.
+
+**Ambient Air Temperature [Â°C]:**The quantitative representation of the atmospheric air's temperature in a specific location at a given time.
+
+### W.r.t Air Flow Rate from Mass Flow Sensor [g/s]
+
+**Engine RPM (rpm):**
+Higher RPM usually indicates more power is being produced, which often requires more fuel. Maintaining a moderate RPM range can help optimize air flow rate.
+
+**Absolute Throttle Position B(%), Accelerator Pedal Position D(%), Accelerator Pedal Position E(%):**
+These factors relate to how the driver controls the engine's power. Aggressive acceleration and high throttle positions generally lead to higher fuel consumption, as more fuel is injected to produce the desired power.
+
+**Engine Coolant Temperature (°C):** 
+A properly warmed-up engine (within optimal temperature range) tends to operate more efficiently, leading to better air flow rate.
+
+**Intake Air Temperature (°C):** 
+Cooler air is denser and contains more oxygen, which can lead to better combustion efficiency. However, excessively cold air may require more fuel to maintain the proper air flow rate.
+
+**Ambient Air Temperature [°C]:**
+Lower temperatures can lead to denser air, potentially increasing engine power due to better oxygen intake.
+However, extremely cold temperatures might require longer warm-up periods and could affect air flow rate, especially in older vehicles or those without advanced engine management systems.
+
+**Intake Manifold Absolute Pressure [kPa]:**
+IMAP measures the pressure in the intake manifold and affects the engine's air-fuel ratio.
+Higher pressure typically indicates denser air, which allows for better fuel combustion, potentially enhancing air flow rate.
+
+**Vehicle Speed Sensor [km/h]:**
+Vehicle speed affects air flow rate due to the engine's workload.
+Higher speeds generally result in increased aerodynamic drag and greater engine effort, leading to higher air flow rate.
+
+### Analysis of dataset
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(dplyr)
+library(hrbrthemes)
+```
+
+```{r}
+data <- read.csv('final_df_preprocessed.csv', na.strings = "-")
+# fleet1 <- read.csv('final_df_preprocessed.csv', na.strings = "-")
+# fleet2 <- read.csv('final_df_preprocessed.csv', na.strings = "-")
+fleet3 <- read.csv('fleet3.csv', na.strings = "-")
+# fleet4 <- read.csv('final_df_preprocessed.csv', na.strings = "-")
+```
+
+```{r}
+str(data)
+str(fleet3)
+```
+
+```{r}
+column_names <- names(data)
+column_names
+```
+```{r}
+elements_to_remove <- c("X", "Time", "label")
+column_names <- column_names[!column_names %in% elements_to_remove]
+```
+
+```{r}
+column_names
+```
+
+```{r}
+target_variable <- "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s"
+columns_to_process <- c("Engine_Coolant_Temperature_degreesC", "Intake_Manifold_Absolute_Pressure_kPa", "Engine_RPM_RPM", "Vehicle_Speed_Sensor_km_h", "Intake_Air_Temperature_degreesC", "Absolute_Throttle_Position_", "Intake_Air_Temperature_degreesC", "Intake_Air_Temperature_A_degreesC", "Ambient_Air_Temperature_degreesC", "Accelerator_Pedal_Position_D_", "Accelerator_Pedal_Position_E_", "Engine_Coolant_Temperature_A_degreesC")
+```
+
+
+```{r}
+one_cat_one_num <- function(columns_to_process) {
+  # Create an empty list to store the plots
+  plot_list <- list()
+  dataset <- data
+  # Loop through the vector of column names
+  for (variable in columns_to_process) {
+    
+    # Replace NA with zero in the dataset for the current column
+    dataset <- dataset %>%
+      mutate(!!sym(variable) := ifelse(is.na(!!sym(variable)), 0, !!sym(variable))) 
+    
+    # Create bins for the current column
+    dataset <- dataset %>%
+      mutate(bin = cut(!!sym(variable), breaks = 4))
+    
+    # Create a boxplot for the current column
+    p <- ggplot(data = dataset, aes(x = bin, y = Air_Flow_Rate_from_Mass_Flow_Sensor_g_s)) +
+      geom_boxplot(fill = "#69b3a2") +
+      theme_minimal() +
+      xlab(variable)
+    
+    # Store the plot in the list
+    plot_list[[variable]] <- p
+  }
+  
+  # Print or display the plots from the list
+  for (i in 1:length(plot_list)) {
+    print(plot_list[[i]])
+  } 
+}
+```
+
+```{r}
+# Call this func for all the fleets
+one_cat_one_num(columns_to_process)
+```
+
+### STATISTICAL TESTING:
+
+```{r}
+perform_ANOVA <- function(data, target_variable, columns_to_process) {
+  # Create an empty list to store ANOVA results
+  anova_results <- list()
+  
+  # Loop through the vector of column names
+  for (variable in columns_to_process) {
+    # Perform ANOVA test for the current column
+    anova_result <- aov(data[[target_variable]] ~ data[[variable]])
+    
+    # Store ANOVA result in the list
+    anova_results[[variable]] <- summary(anova_result)
+  }
+  
+  return(anova_results)
+}
+```
+
+```{r}
+call_ANOVA <- function(data, target_variable, columns_to_process) {
+  anova_results <- perform_ANOVA(fleet3, target_variable, columns_to_process)
+  # Print ANOVA results for each column
+  for (variable in names(anova_results)) {
+    print(paste("ANOVA results for", variable))
+    print(anova_results[[variable]])
+  }
+}
+```
+
+```{r}
+# Call this func for all the fleets
+call_ANOVA(fleet3, "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s", columns_to_process)
+```
+
+**Interpretations:**
+***Engine_Coolant_Temperature_degreesC***
+**Df (Degrees of Freedom):** 1 (Between groups), 32350 (Within groups)
+**Sum Sq (Sum of Squares):** Between groups: 8006, Within groups: 3072923
+**F value:** 84.3
+**Pr(>F):** p-value is significantly less than 0.05 (given as <2e-16), indicating a statistically significant difference between groups.
+
+This suggests that the variable "Engine_Coolant_Temperature_degreesC" significantly affects the "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+Intake_Manifold_Absolute_Pressure_kPa, Engine_RPM_RPM, Vehicle_Speed_Sensor_km_h, Intake_Air_Temperature_degreesC, Absolute_Throttle_Position_, Ambient_Air_Temperature_degreesC, Accelerator_Pedal_Position_D_, Accelerator_Pedal_Position_E_, Engine_Coolant_Temperature_A_degreesC
+For all these variables, the ANOVA tests show extremely low p-values (<2e-16), indicating significant differences between groups. These variables are also likely to have a significant impact on the target variable "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+***Intake_Air_Temperature_A_degreesC***
+The p-value (0.22) for this variable is greater than 0.05, suggesting that there isn't sufficient evidence to conclude a significant impact of "Intake_Air_Temperature_A_degreesC" on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Now we will bin for both the target and independent variables**
+
+```{r}
+plot_binned_variables <- function(dataset, columns_to_process, target_variable) {
+  # Create an empty list to store the plots
+  plot_list <- list()
+  
+  # Binning for the target variable
+  dataset <- dataset %>%
+    mutate(target_bin = cut(!!sym(target_variable), breaks = 4))
+  
+  # Loop through the vector of column names
+  for (variable in columns_to_process) {
+    # Replace NA with zero in the dataset for the current column
+    dataset <- dataset %>%
+      mutate(!!sym(variable) := ifelse(is.na(!!sym(variable)), 0, !!sym(variable))) 
+    
+    # Binning for both categorical and numeric variables
+    if (is.numeric(dataset[[variable]])) {
+      dataset <- dataset %>%
+        mutate(!!sym(paste0(variable, "_bin")) := cut(!!sym(variable), breaks = 4))
+    } else {
+      dataset[[variable]] <- as.factor(dataset[[variable]])
+    }
+    
+    # Create a boxplot for the current column w.r.t target variable
+    p <- ggplot(data = dataset, aes(x = !!sym(paste0(variable, "_bin")), y = !!sym(target_variable))) +
+      geom_boxplot(fill = "#69b3a2") +
+      theme_minimal() +
+      xlab(variable) +
+      ylab(target_variable) +
+      ggtitle(paste("Boxplot of", variable, "vs", target_variable))
+    
+    # Store the plot in the list
+    plot_list[[variable]] <- p
+  }
+  
+  # Print or display the plots from the list
+  for (i in 1:length(plot_list)) {
+    print(plot_list[[i]])
+  }
+}
+```
+
+```{r}
+# Call the function with columns_to_process and target variable
+plot_binned_variables(fleet3, columns_to_process, target_variable)
+```
+
+
+

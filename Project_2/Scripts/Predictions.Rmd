@@ -104,38 +104,45 @@ df4=read.csv("Fleet_prediction_data_fleet_4.csv")
 str(df2)
 str(df3)
 str(df4)
+df2_temp=df2
+df3_temp=df3
+df4_temp=df4
 ```
 ```{r}
-df2$X <- NULL
-df2$Unnamed..0<-NULL
-df2$label<-NULL
-df2$distance_from_1<-NULL
-df2$Time<-NULL
-df2$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s<-NULL
-str(df2)
-df3$X <- NULL
-df3$Unnamed..0<-NULL
-df3$label<-NULL
-df3$distance_from_1<-NULL
-df3$Time<-NULL
-df3$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s<-NULL
-str(df3)
-df4$X <- NULL
-df4$Unnamed..0<-NULL
-df4$label<-NULL
-df4$distance_from_1<-NULL
-df4$Time<-NULL
-df4$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s<-NULL
-str(df4)
+df2_temp$X <- NULL
+df2_temp$Unnamed..0<-NULL
+df2_temp$label<-NULL
+df2_temp$distance_from_1<-NULL
+df2_temp$Time<-NULL
+df2_temp$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s<-NULL
+str(df2_temp)
+df3_temp$X <- NULL
+df3_temp$Unnamed..0<-NULL
+df3_temp$label<-NULL
+df3_temp$distance_from_1<-NULL
+df3_temp$Time<-NULL
+df3_temp$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s<-NULL
+str(df3_temp)
+df4_temp$X <- NULL
+df4_temp$Unnamed..0<-NULL
+df4_temp$label<-NULL
+df4_temp$distance_from_1<-NULL
+df4_temp$Time<-NULL
+df4_temp$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s<-NULL
+str(df4_temp)
 ```
 ```{r}
 library(randomForest)
-Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_2 <- predict(model_2, newdata = df2)
+Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_2 <- predict(model_2, newdata = df2_temp)
 print(Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_2)
 ```
 ```{r}
-Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_3 <- predict(model_3, newdata = df3)
+Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_3 <- predict(model_3, newdata = df3_temp)
 print(Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_3)
+```
+```{r}
+Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_4 <- predict(model_4, newdata = df4_temp)
+print(Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_4)
 ```
 
 

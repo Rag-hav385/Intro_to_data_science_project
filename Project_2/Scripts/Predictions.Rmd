@@ -128,5 +128,12 @@ df4$Time<-NULL
 df4$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s<-NULL
 str(df4)
 ```
+```{r}
+library(randomForest)
+Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_2 <- predict(model_2, newdata = df2)
+print(Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_2)
+```
+
+
 
 

@@ -95,5 +95,10 @@ tuneValue: Information related to tuning parameters during model training. It's 
 obsLevels: Logical indicating whether observed levels of the response variable were included.
 
 param: A list containing information about additional parameters.
+```{r}
+df2=read.csv("Fleet_prediction_data_fleet_2.csv")
+df3=read.csv("Fleet_prediction_data_fleet_3.csv")
+df4=read.csv("Fleet_prediction_data_fleet_4.csv")
+```
 
 

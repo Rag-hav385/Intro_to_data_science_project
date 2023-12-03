@@ -100,5 +100,33 @@ df2=read.csv("Fleet_prediction_data_fleet_2.csv")
 df3=read.csv("Fleet_prediction_data_fleet_3.csv")
 df4=read.csv("Fleet_prediction_data_fleet_4.csv")
 ```
+```{r}
+str(df2)
+str(df3)
+str(df4)
+```
+```{r}
+df2$X <- NULL
+df2$Unnamed..0<-NULL
+df2$label<-NULL
+df2$distance_from_1<-NULL
+df2$Time<-NULL
+df2$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s<-NULL
+str(df2)
+df3$X <- NULL
+df3$Unnamed..0<-NULL
+df3$label<-NULL
+df3$distance_from_1<-NULL
+df3$Time<-NULL
+df3$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s<-NULL
+str(df3)
+df4$X <- NULL
+df4$Unnamed..0<-NULL
+df4$label<-NULL
+df4$distance_from_1<-NULL
+df4$Time<-NULL
+df4$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s<-NULL
+str(df4)
+```
 
 

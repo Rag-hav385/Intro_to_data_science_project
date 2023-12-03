@@ -133,6 +133,10 @@ library(randomForest)
 Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_2 <- predict(model_2, newdata = df2)
 print(Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_2)
 ```
+```{r}
+Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_3 <- predict(model_3, newdata = df3)
+print(Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_3)
+```
 
 
 

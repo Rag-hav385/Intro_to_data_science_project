@@ -246,19 +246,51 @@ call_ANOVA(fleet3, "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s", columns_to_process
 ```
 
 **Interpretations:**
-***Engine_Coolant_Temperature_degreesC***
-**Df (Degrees of Freedom):** 1 (Between groups), 32350 (Within groups)
-**Sum Sq (Sum of Squares):** Between groups: 8006, Within groups: 3072923
-**F value:** 84.3
-**Pr(>F):** p-value is significantly less than 0.05 (given as <2e-16), indicating a statistically significant difference between groups.
+Interpretation for each ANOVA test result for the variables concerning their impact on the "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s":
 
-This suggests that the variable "Engine_Coolant_Temperature_degreesC" significantly affects the "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+**Engine_Coolant_Temperature_degreesC**
 
-Intake_Manifold_Absolute_Pressure_kPa, Engine_RPM_RPM, Vehicle_Speed_Sensor_km_h, Intake_Air_Temperature_degreesC, Absolute_Throttle_Position_, Ambient_Air_Temperature_degreesC, Accelerator_Pedal_Position_D_, Accelerator_Pedal_Position_E_, Engine_Coolant_Temperature_A_degreesC
-For all these variables, the ANOVA tests show extremely low p-values (<2e-16), indicating significant differences between groups. These variables are also likely to have a significant impact on the target variable "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+Interpretation: The p-value is significantly less than 0.05 (<2e-16), indicating a statistically significant difference between groups. This suggests that the variable "Engine_Coolant_Temperature_degreesC" significantly affects the "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
 
-***Intake_Air_Temperature_A_degreesC***
-The p-value (0.22) for this variable is greater than 0.05, suggesting that there isn't sufficient evidence to conclude a significant impact of "Intake_Air_Temperature_A_degreesC" on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+**Intake_Manifold_Absolute_Pressure_kPa**
+
+Interpretation: The extremely low p-value (<2e-16) suggests a significant difference between groups. This indicates that "Intake_Manifold_Absolute_Pressure_kPa" likely has a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Engine_RPM_RPM**
+
+Interpretation: The very low p-value (<2e-16) indicates a significant difference between groups. This implies that "Engine_RPM_RPM" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Vehicle_Speed_Sensor_km_h**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Vehicle_Speed_Sensor_km_h" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Air_Temperature_degreesC**
+
+Interpretation: The p-value is significantly less than 0.05 (<2e-16), indicating a statistically significant difference between groups. This suggests that "Intake_Air_Temperature_degreesC" significantly affects "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Absolute_Throttle_Position_**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This implies that "Absolute_Throttle_Position_" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Air_Temperature_A_degreesC**
+
+Interpretation: The p-value (0.224) is greater than 0.05, suggesting that there isn't sufficient evidence to conclude a significant impact of "Intake_Air_Temperature_A_degreesC" on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Ambient_Air_Temperature_degreesC**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Ambient_Air_Temperature_degreesC" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Accelerator_Pedal_Position_D_**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Accelerator_Pedal_Position_D_" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Accelerator_Pedal_Position_E_**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Accelerator_Pedal_Position_E_" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Engine_Coolant_Temperature_A_degreesC**
+
+Interpretation: The p-value is significantly less than 0.05 (<2e-16), indicating a statistically significant difference between groups. This suggests that "Engine_Coolant_Temperature_A_degreesC" significantly affects "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
 
 **Now we will bin for both the target and independent variables**
 
@@ -330,6 +362,7 @@ for (p in plots) {
   print(p)
 }
 ```
+
 
 
 

@@ -1,0 +1,68 @@
+---
+title: "ANOVA test results for fleet4 "
+output: html_document
+date: "2023-12-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+**Interpretations:**
+
+**Fleet4**
+
+Interpretation for each ANOVA test result for the variables concerning their impact on the "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s":
+
+**Engine_Coolant_Temperature_degreesC**
+
+Interpretation: Highly significant relationship (p < 2e-16) between engine coolant temperature and Air_Flow_Rate_from_Mass_Flow_Sensor_g_s. 
+
+**Intake_Manifold_Absolute_Pressure_kPa**
+
+Interpretation: Highly significant relationship (p < 2e-16) between intake manifold absolute pressure and Air_Flow_Rate_from_Mass_Flow_Sensor_g_s. 
+
+**Engine_RPM_RPM**
+
+Interpretation: Highly significant relationship (p < 2e-16) between engine RPM and Air_Flow_Rate_from_Mass_Flow_Sensor_g_s. 
+
+**Vehicle_Speed_Sensor_km_h**
+
+Interpretation: Highly significant relationship (p < 2e-16) between vehicle speed sensor readings and Air_Flow_Rate_from_Mass_Flow_Sensor_g_s. 
+
+**Intake_Air_Temperature_degreesC**
+
+Interpretation: Significant relationship (p = 3.22e-06) between intake air temperature and Air_Flow_Rate_from_Mass_Flow_Sensor_g_s.
+
+**Absolute_Throttle_Position_**
+
+Interpretation: Highly significant relationship (p < 2e-16) between absolute throttle position and Air_Flow_Rate_from_Mass_Flow_Sensor_g_s.
+
+**Intake_Air_Temperature_A_degreesC**
+
+Interpretation: Highly significant relationship (p < 2e-16) between an alternate measure of intake air temperature and Air_Flow_Rate_from_Mass_Flow_Sensor_g_s. 
+
+**Ambient_Air_Temperature_degreesC**
+
+Interpretation: No significant relationship (p = 0.967) between ambient air temperature and Air_Flow_Rate_from_Mass_Flow_Sensor_g_s.
+
+**Accelerator_Pedal_Position_D_**
+
+Interpretation: Highly significant relationship (p < 2e-16) between accelerator pedal position (D) and Air_Flow_Rate_from_Mass_Flow_Sensor_g_s. 
+
+**Accelerator_Pedal_Position_E_**
+
+Interpretation: Highly significant relationship (p < 2e-16) between accelerator pedal position (E) and Air_Flow_Rate_from_Mass_Flow_Sensor_g_s. 
+
+**Engine_Coolant_Temperature_A_degreesC**
+
+Interpretation:  Highly significant relationship (p < 2e-16) between an alternate measure of engine coolant temperature and Air_Flow_Rate_from_Mass_Flow_Sensor_g_s. 
+
+
+
+
+
+
+
+

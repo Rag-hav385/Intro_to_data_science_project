@@ -136,51 +136,28 @@ Higher speeds generally result in increased aerodynamic drag and greater engine 
 ```{r}
 library(dplyr)
 library(ggplot2)
-library(dplyr)
 library(hrbrthemes)
 ```
 
 ```{r}
 data <- read.csv('final_df_preprocessed.csv', na.strings = "-")
-fleet1 <- read.csv('/Users/sanjayramrajasrinsanjayivasan/Desktop/fleet1.csv', na.strings = "-")
-fleet2 <- read.csv('/Users/sanjayramrajasrinsanjayivasan/Desktop/fleet2.csv', na.strings = "-")
-fleet3 <- read.csv('/Users/sanjayramrajasrinsanjayivasan/Desktop/fleet3.csv', na.strings = "-")
-fleet4 <- read.csv('/Users/sanjayramrajasrinsanjayivasan/Desktop/fleet4.csv', na.strings = "-")
+# fleet1 <- read.csv('final_df_preprocessed.csv', na.strings = "-")
+# fleet2 <- read.csv('final_df_preprocessed.csv', na.strings = "-")
+fleet3 <- read.csv('fleet3.csv', na.strings = "-")
 # fleet4 <- read.csv('final_df_preprocessed.csv', na.strings = "-")
 ```
 
 ```{r}
-#str(data)
-str(fleet1)
+str(data)
 str(fleet3)
-str(fleet4)
-str(fleet2)
-```
-```{r}
-#Pre-processing of Different Fleets
-
-# Remove the 'X' column
-fleet4 <- fleet4[, !names(fleet4) %in% "X"]
-
-# Remove columns from fleet3
-fleet3 <- fleet3[, !names(fleet3) %in% c("X.1", "X", "Time")]
-
-# Remove columns from fleet2
-fleet2 <- fleet2[, !names(fleet2) %in% c("X.1", "X", "Time")]
-
-# Remove columns from fleet1
-fleet1 <- fleet1[, !names(fleet1) %in% c("X.1", "X", "Time")]
-
-
 ```
 
 ```{r}
 column_names <- names(data)
-#column_names_fleet4 <- names(fleet4)
 column_names
 ```
 ```{r}
-elements_to_remove <- c("X", "Time", "label", "X.1")
+elements_to_remove <- c("X", "Time", "label")
 column_names <- column_names[!column_names %in% elements_to_remove]
 ```
 
@@ -331,6 +308,29 @@ plot_binned_variables <- function(dataset, columns_to_process, target_variable) 
 # Call the function with columns_to_process and target variable
 plot_binned_variables(fleet3, columns_to_process, target_variable)
 ```
+
+**KDE Plots:**
+```{r}
+# Create a list to store the plots
+plots <- list()
+
+# Loop through each column and create density plots
+for (col in columns_to_process) {
+  if (col != target_variable) {
+    p <- ggplot(fleet3, aes_string(x = fleet3[[target_variable]], fill = col)) +
+      geom_density(alpha = 0.5) +
+      labs(title = paste("Density plot of", target_variable, "and", col))
+    
+    plots[[col]] <- p
+  }
+}
+
+# Display the plots
+for (p in plots) {
+  print(p)
+}
+```
+
 
 
 

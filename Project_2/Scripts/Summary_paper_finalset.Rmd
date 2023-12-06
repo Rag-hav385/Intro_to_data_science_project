@@ -137,14 +137,17 @@ Higher speeds generally result in increased aerodynamic drag and greater engine 
 library(dplyr)
 library(ggplot2)
 library(hrbrthemes)
+library(cowplot)
+library(gridExtra)
+library(grid)
 ```
 
 ```{r}
 data <- read.csv('final_df_preprocessed.csv', na.strings = "-")
-# fleet1 <- read.csv('final_df_preprocessed.csv', na.strings = "-")
-# fleet2 <- read.csv('final_df_preprocessed.csv', na.strings = "-")
+fleet1 <- read.csv('fleet1.csv', na.strings = "-")
+fleet2 <- read.csv('fleet2.csv', na.strings = "-")
 fleet3 <- read.csv('fleet3.csv', na.strings = "-")
-# fleet4 <- read.csv('final_df_preprocessed.csv', na.strings = "-")
+fleet4 <- read.csv('fleet4.csv', na.strings = "-")
 ```
 
 ```{r}
@@ -172,10 +175,10 @@ columns_to_process <- c("Engine_Coolant_Temperature_degreesC", "Intake_Manifold_
 
 
 ```{r}
-one_cat_one_num <- function(columns_to_process) {
+one_cat_one_num <- function(columns_to_process, dataset) {
   # Create an empty list to store the plots
   plot_list <- list()
-  dataset <- data
+  # dataset <- data
   # Loop through the vector of column names
   for (variable in columns_to_process) {
     
@@ -197,16 +200,34 @@ one_cat_one_num <- function(columns_to_process) {
     plot_list[[variable]] <- p
   }
   
-  # Print or display the plots from the list
-  for (i in 1:length(plot_list)) {
-    print(plot_list[[i]])
-  } 
+  # Set the size of the entire grid
+  grid.arrange(grobs = plot_list, ncol = 3)
 }
 ```
 
+**Fleet1:**
+
 ```{r}
 # Call this func for all the fleets
-one_cat_one_num(columns_to_process)
+one_cat_one_num(columns_to_process, fleet1)
+```
+
+**Fleet2:**
+
+```{r}
+one_cat_one_num(columns_to_process, fleet2)
+```
+
+**Fleet3:**
+
+```{r}
+one_cat_one_num(columns_to_process, fleet3)
+```
+
+**Fleet4:**
+
+```{r}
+one_cat_one_num(columns_to_process, fleet4)
 ```
 
 ### STATISTICAL TESTING:
@@ -291,6 +312,45 @@ Interpretation: The extremely low p-value (<2e-16) indicates a significant diffe
 **Engine_Coolant_Temperature_A_degreesC**
 
 Interpretation: The p-value is significantly less than 0.05 (<2e-16), indicating a statistically significant difference between groups. This suggests that "Engine_Coolant_Temperature_A_degreesC" significantly affects "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+```{r}
+# Call this func for fleet1
+call_ANOVA(fleet1, "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s", columns_to_process)
+```
+**Interpretations:**
+**Engine_Coolant_Temperature_degreesC**
+
+Interpretation: The p-value (<2e-16) is significantly less than 0.05, indicating a statistically significant difference between groups. This suggests that the variable "Engine_Coolant_Temperature_degreesC" significantly affects the "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Manifold_Absolute_Pressure_kPa**
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Intake_Manifold_Absolute_Pressure_kPa" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Engine_RPM_RPM**
+Interpretation: The very low p-value (<2e-16) indicates a significant difference between groups. This implies that "Engine_RPM_RPM" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Vehicle_Speed_Sensor_km_h**
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Vehicle_Speed_Sensor_km_h" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Air_Temperature_degreesC**
+Interpretation: The p-value (<2e-16) is significantly less than 0.05, indicating a statistically significant difference between groups. This suggests that "Intake_Air_Temperature_degreesC" significantly affects "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Absolute_Throttle_Position_**
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This implies that "Absolute_Throttle_Position_" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Air_Temperature_A_degreesC**
+Interpretation: The p-value (0.224) is greater than 0.05, indicating a lack of evidence to conclude a significant impact of "Intake_Air_Temperature_A_degreesC" on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Ambient_Air_Temperature_degreesC**
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Ambient_Air_Temperature_degreesC" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Accelerator_Pedal_Position_D_**
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Accelerator_Pedal_Position_D_" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Accelerator_Pedal_Position_E_**
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Accelerator_Pedal_Position_E_" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Engine_Coolant_Temperature_A_degreesC**
+Interpretation: The p-value (<2e-16) is significantly less than 0.05, indicating a statistically significant difference between groups. This suggests that "Engine_Coolant_Temperature_A_degreesC" significantly affects "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
 
 **Now we will bin for both the target and independent variables**
 

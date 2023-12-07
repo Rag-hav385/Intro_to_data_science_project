@@ -85,7 +85,7 @@ Our overarching aim remains centered on utilizing machine learning models to pro
 
 ### Problem Statement:
 
-Our primary focus now lies in analyzing the remaining clusters (referred to as fleets) to discern which among them exhibits similarities to 'fleet1', the underperforming cluster identified earlier. This comparison will enable us to draw insights and further understand the similarities and differences between the fleet clusters, aiding us in addressing our project goals effectively.
+Our primary focus now lies in analyzing the remaining clusters (referred to as fleets) to discern which among them exhibits similarities to 'fleet1', the underperforming fleet identified earlier. This comparison will enable us to draw insights and further understand the similarities and differences between fleets, aiding us in addressing our project goals effectively.
 
 ### Parametric Description:
 
@@ -134,6 +134,7 @@ Higher speeds generally result in increased aerodynamic drag and greater engine 
 ### Analysis of dataset
 
 ```{r}
+library(knitr)
 library(dplyr)
 library(ggplot2)
 library(hrbrthemes)

@@ -154,6 +154,9 @@ fleet4 <- read.csv('fleet4.csv', na.strings = "-")
 ```{r}
 str(data)
 str(fleet3)
+str(fleet1)
+str(fleet2)
+str(fleet4)
 ```
 
 ```{r}
@@ -201,8 +204,10 @@ one_cat_one_num <- function(columns_to_process, dataset) {
     plot_list[[variable]] <- p
   }
   
-  # Set the size of the entire grid
-  grid.arrange(grobs = plot_list, ncol = 3)
+  # Print or display the plots from the list
+  for (i in 1:length(plot_list)) {
+    print(plot_list[[i]])
+  } 
 }
 ```
 

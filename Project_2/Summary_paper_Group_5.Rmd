@@ -1,0 +1,739 @@
+---
+title: "Monitoring Engine Health Through Better Air Flow Rate"
+date: "2023-11-25"
+#bibliography: "bibliography.bib"
+output: 
+  html_document:
+    theme: journal
+    code_folding: hide
+    number_sections: FALSE
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+author: 
+  - name          : "Raghav Agarwal"
+    affiliation   : "1"
+    corresponding : yes
+    address       : "Arlington,VA"
+    email         : "raghav.agarwal@gwu.edu"
+    role: 
+      - "Descriptive Analysis"
+      - "Solution Building"
+      - "Project 2 Proposal"
+  - name          : "Harshavardana Reddy Kolan"
+    affiliation   : "2"
+    corresponding : no    # Define only one corresponding author
+    address       : "Fairfax,VA"
+    email         : "harshavardanareddy.kolan@gwu.edu"
+    role:
+      - "Descriptive Analysis"
+      - "Solution Building"
+      - "Clustering based on Fuel Mass"
+      
+  - name          : "Shikha Kumari"
+    affiliation   : "3"
+    corresponding : no
+    address       : "Arlington,VA"
+    email         : "shikha.kumari@gwu.edu"
+    role: 
+      - "Creation of Label Column"
+      - "Segregation of following and not-following parameters"
+      - "Analysis of C.I. for Environment and Temperature related parameters"
+      
+  - name          : "Sanjayram Raja Srinivasan"
+    affiliation   : "4"
+    corresponding : no    # Define only one corresponding author
+    address       : "Arlington,VA"
+    email         : "sanjayram.rajasrinivasan@gwu.edu"
+    role: 
+      - "Segregation of Following and Not Following Parameters"
+      - "Analysis of Trip related parameters"
+
+affiliation:
+  - id            : "1 , 2 , 3 , 4"
+    institution   : "The George Washington University"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = F, message = F)
+```
+## Abstract
+The Vehicle Energy Dataset (VED) is a comprehensive collection of data from 383 personal cars in Ann Arbor, Michigan, providing detailed insights into vehicle behavior and energy consumption. The dataset covers diverse vehicle types, including 264 gasoline vehicles, 92 hybrid electric vehicles (HEVs), and 27 plug-in hybrid/electric vehicles (PHEV/EVs). Spanning from November 2017 to November 2018, VED captures a full year of driving experiences, showcasing seasonal variations and diverse terrains.
+
+The dataset's richness lies in its documentation of real-world driving scenarios, from urban sprawls to highways, accumulating 374,000 miles. This extensive mileage serves as a robust foundation for in-depth analyses, offering a goldmine for researchers exploring vehicle energy consumption and performance across different contexts.
+
+The project, "Monitoring Vehicles Health," utilizes VED to develop an engine recommendation system focused on optimizing Air Flow Rate. Through clustering analysis, distinct fleets ('fleet1', 'fleet2', 'fleet3', and 'fleet4') were identified, with 'fleet1' exhibiting suboptimal Air Flow Rate performance. The project aims to understand similarities and differences between fleets, leveraging machine learning models to empower drivers with actionable insights for enhanced vehicle performance and health maintenance.
+
+Keywords: Monitoring Vehicles Health, Air Flow Rate, Anova, Recommendation , Fleets
+
+## About the Data
+
+The Vehicle Energy Dataset (VED), utilized in our project, stands as a significant contribution to understanding vehicle behavior and energy consumption patterns, encompassing a vast array of data collected from 383 personal cars in Ann Arbor, Michigan. This comprehensive open dataset contains detailed GPS trajectories alongside time-series data on fuel, energy, speed, and auxiliary power usage.
+
+The breadth and depth of the Vehicle Energy Dataset (VED) are underscored by its inclusion of various vehicle types, providing a comprehensive view of the automotive landscape. Within this dataset, the presence of 264 gasoline vehicles, 92 hybrid electric vehicles (HEVs), and 27 plug-in hybrid/electric vehicles (PHEV/EVs) offers an expansive spectrum for analysis. These distinct vehicle categories inherently possess diverse energy consumption patterns and driving behaviors, forming a rich tapestry of information essential for comparative studies and nuanced insights into the energy dynamics across different vehicle technologies.
+
+VED's temporal scope, spanning from November 2017 to November 2018, encapsulates a full year of driving experiences. This duration encompasses a wide array of seasons, from the crisp days of fall to the snowy winters and the bloom of spring, presenting an invaluable opportunity to observe how driving conditions fluctuate throughout the year. Moreover, the dataset's documentation of real-world driving scenarios offers a comprehensive glimpse into diverse terrains, from urban sprawls with congested traffic to highways with varying speed limits, thereby capturing the complexities of driving environments that directly impact energy consumption and efficiency.
+
+The accumulation of 374,000 miles within this timeframe signifies not just a vast quantity of data but a rich repository of real-world driving experiences. Each mile logged in the dataset represents a unique journey, a distinct set of driving behaviors, and energy usage patterns. This extensive mileage contributes to the dataset's robustness, providing a substantial foundation for conducting in-depth analyses and deriving statistically significant conclusions regarding vehicle energy consumption and performance across different driving contexts and vehicle types.
+
+In essence, VED's inclusion of diverse vehicle types, coupled with its comprehensive coverage of driving conditions across seasons and terrains, alongside the substantial mileage accumulated, positions it as a goldmine for researchers and practitioners seeking to explore, understand, and optimize vehicle energy usage and behavior. This depth and diversity pave the way for multifaceted analyses and innovative solutions aimed at enhancing the efficiency and sustainability of future automotive technologies.
+
+Given the extensive and diverse nature of the Vehicle Energy Dataset (VED), encompassing various vehicle types and driving conditions across seasons and terrains, our project aims to leverage this wealth of information to analyze and optimize vehicle energy usage. In pursuit of our goal to develop an engine recommendation system, we are now focusing on comparing other clusters (termed as fleets) within the dataset to identify similarities with 'fleet1,' the cluster exhibiting suboptimal performance in Air Flow Rate. This comparative analysis will provide valuable insights into the diverse behaviors across different vehicle groups, facilitating our efforts to enhance driving efficiency and offer actionable guidance to drivers.
+
+Our project, "Monitoring Vehicles Health," centers on developing an engine recommendation system using diverse machine learning models. The primary objective is to guide drivers in optimizing Air Flow Rate while driving. Our dataset consists of distinct groups initially, which were further segmented into clusters or labels based on inherent patterns and behaviors.
+
+Upon analyzing the clustered dataset using boxplots, intriguing patterns emerged. Specifically, certain clusters like 'KA_BB', 'KA_RT', and 'S_KA' displayed nearly identical mean values. Similarly, clusters such as 'KA_KA', 'S_S', and 'RT_S', along with 'BB_RT', 'RT_RT', and 'S_CW', showcased similar characteristics.
+
+To streamline our analysis, we merged clusters with similar behavior, resulting in the formation of four distinct clusters: 'fleet1', 'fleet2', 'fleet3', and 'fleet4'. Notably, 'fleet1' demonstrated the least favorable performance when examining the 'Air_Flow_Rate_from_Mass_Flow_Sensor_g_s' column (y_label).
+
+Hence, we conducted a detailed analysis on the fleets. This detailed examination aims to understand the contributing factors influencing the performance of fleets and lays the groundwork for optimizing strategies within our engine recommendation system.
+
+Our overarching aim remains centered on utilizing machine learning models to provide actionable insights to drivers, empowering them to optimize Air Flow Rate for enhanced vehicle performance and health maintenance while on the road.
+
+### Problem Statement:
+
+Our primary focus now lies in analyzing the remaining clusters (referred to as fleets) to discern which among them exhibits similarities to 'fleet1', the underperforming fleet identified earlier. This comparison will enable us to draw insights and further understand the similarities and differences between fleets, aiding us in addressing our project goals effectively.
+
+### Parametric Description:
+
+**Intake Manifold Absolute Pressure [kPa]:** refers to the atmospheric pressure within the engine's intake manifold, measured in kilopascals. It signifies the pressure level crucial for optimizing fuel-air mixture, influencing engine performance and efficiency.
+
+**Engine RPM(rpm):** This indicates how fast the engine is spinning. It's crucial for understanding engine performance and fuel consumption, as higher RPMs often mean higher fuel consumption.
+
+**Vehicle Speed Sensor [km/h]:** measures the speed of a vehicle in kilometers per hour. It provides real-time data on the vehicle's movement, essential for monitoring speed, navigation, and analyzing driving behavior or performance.
+
+**Accelerator Pedal Position D(%) and Accelerator Pedal Position E(%):** These show the percentage of depression of the accelerator pedal. It helps in understanding driver behavior and how aggressively the vehicle is being driven.
+
+**Engine Coolant Temperature (°C):** It indicates the temperature of the engine coolant, which is important for engine performance and efficiency.
+
+**Intake Air Temperature(°C):** This measures the temperature of the air entering the engine. Cooler air is denser, which can affect combustion efficiency and fuel consumption.
+
+**Absolute Throttle Position B(%):** This is the percentage at which the throttle is open. It's important because it shows how much power the engine is producing relative to its maximum capacity.
+
+**Ambient Air Temperature [Â°C]:**The quantitative representation of the atmospheric air's temperature in a specific location at a given time.
+
+### W.r.t Air Flow Rate from Mass Flow Sensor [g/s]
+
+**Engine RPM (rpm):**
+Higher RPM usually indicates more power is being produced, which often requires more fuel. Maintaining a moderate RPM range can help optimize air flow rate.
+
+**Absolute Throttle Position B(%), Accelerator Pedal Position D(%), Accelerator Pedal Position E(%):**
+These factors relate to how the driver controls the engine's power. Aggressive acceleration and high throttle positions generally lead to higher fuel consumption, as more fuel is injected to produce the desired power.
+
+**Engine Coolant Temperature (°C):** 
+A properly warmed-up engine (within optimal temperature range) tends to operate more efficiently, leading to better air flow rate.
+
+**Intake Air Temperature (°C):** 
+Cooler air is denser and contains more oxygen, which can lead to better combustion efficiency. However, excessively cold air may require more fuel to maintain the proper air flow rate.
+
+**Ambient Air Temperature [°C]:**
+Lower temperatures can lead to denser air, potentially increasing engine power due to better oxygen intake.
+However, extremely cold temperatures might require longer warm-up periods and could affect air flow rate, especially in older vehicles or those without advanced engine management systems.
+
+**Intake Manifold Absolute Pressure [kPa]:**
+IMAP measures the pressure in the intake manifold and affects the engine's air-fuel ratio.
+Higher pressure typically indicates denser air, which allows for better fuel combustion, potentially enhancing air flow rate.
+
+**Vehicle Speed Sensor [km/h]:**
+Vehicle speed affects air flow rate due to the engine's workload.
+Higher speeds generally result in increased aerodynamic drag and greater engine effort, leading to higher air flow rate.
+
+### Analysis of dataset
+
+```{r}
+library(knitr)
+library(dplyr)
+library(ggplot2)
+library(hrbrthemes)
+library(cowplot)
+library(gridExtra)
+library(grid)
+library(patchwork)
+```
+
+```{r}
+#data <- read.csv('/Users/sanjayramrajasrinsanjayivasan/Desktop/final_df_preprocessed.csv', na.strings = "-")
+fleet1 <- read.csv('fleet1.csv', na.strings = "-")
+fleet2 <- read.csv('fleet2.csv', na.strings = "-")
+fleet3 <- read.csv('fleet3.csv', na.strings = "-")
+fleet4 <- read.csv('fleet4.csv', na.strings = "-")
+```
+
+```{r, include=FALSE}
+str(data)
+str(fleet3)
+```
+
+```{r, include=FALSE}
+column_names <- names(data)
+column_names
+```
+```{r}
+elements_to_remove <- c("X", "Time", "label")
+column_names <- column_names[!column_names %in% elements_to_remove]
+```
+
+```{r, include=FALSE}
+column_names
+```
+
+```{r}
+target_variable <- "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s"
+columns_to_process <- c("Engine_Coolant_Temperature_degreesC", "Intake_Manifold_Absolute_Pressure_kPa", "Engine_RPM_RPM", "Vehicle_Speed_Sensor_km_h", "Intake_Air_Temperature_degreesC", "Absolute_Throttle_Position_", "Intake_Air_Temperature_degreesC", "Intake_Air_Temperature_A_degreesC", "Ambient_Air_Temperature_degreesC", "Accelerator_Pedal_Position_D_", "Accelerator_Pedal_Position_E_", "Engine_Coolant_Temperature_A_degreesC")
+```
+
+```{r}
+following_parameters_fleet1 <- c("Engine_RPM_RPM","Absolute_Throttle_Position_","Vehicle_Speed_Sensor_km_h")
+following_parameters_fleet2 <- c("Engine_RPM_RPM","Accelerator_Pedal_Position_E_","Accelerator_Pedal_Position_D_")
+following_parameters_fleet3 <- c("Engine_RPM_RPM", "Vehicle_Speed_Sensor_km_h", "Accelerator_Pedal_Position_D_" )
+following_parameters_fleet4 <- c("Engine_RPM_RPM","Accelerator_Pedal_Position_E_","Accelerator_Pedal_Position_D_" )
+```
+
+
+```{r}
+one_cat_one_num <- function(columns_to_process, dataset) {
+  # Create an empty list to store the plots
+  plot_list <- list()
+  # dataset <- data
+  # Loop through the vector of column names
+  for (variable in columns_to_process) {
+    
+    # Replace NA with zero in the dataset for the current column
+    dataset <- dataset %>%
+      mutate(!!sym(variable) := ifelse(is.na(!!sym(variable)), 0, !!sym(variable))) 
+    
+    # Create bins for the current column
+    dataset <- dataset %>%
+      mutate(bin = cut(!!sym(variable), breaks = 4))
+    
+    # Create a boxplot for the current column
+    p <- ggplot(data = dataset, aes(x = bin, y = Air_Flow_Rate_from_Mass_Flow_Sensor_g_s)) +
+      geom_boxplot(fill = "#69b3a2") +
+      theme_minimal() +
+      xlab(variable)
+    
+    # Store the plot in the list
+    plot_list[[variable]] <- p
+  }
+  
+  # Print or display the plots from the list
+  for (i in 1:length(plot_list)) {
+    print(plot_list[[i]])
+  } 
+}
+```
+
+**Fleet1:**
+
+```{r}
+# Call this func for all the fleets
+one_cat_one_num(following_parameters_fleet1, fleet1)
+```
+
+**Fleet2:**
+
+```{r}
+one_cat_one_num(following_parameters_fleet2, fleet2)
+```
+
+**Fleet3:**
+
+```{r}
+one_cat_one_num(following_parameters_fleet3, fleet3)
+```
+
+**Fleet4:**
+
+```{r}
+one_cat_one_num(following_parameters_fleet4, fleet4)
+```
+
+### STATISTICAL TESTING:
+
+```{r, include=FALSE}
+perform_ANOVA <- function(data, target_variable, columns_to_process) {
+  # Create an empty list to store ANOVA results
+  anova_results <- list()
+  
+  # Loop through the vector of column names
+  for (variable in columns_to_process) {
+    # Perform ANOVA test for the current column
+    anova_result <- aov(data[[target_variable]] ~ data[[variable]])
+    
+    # Store ANOVA result in the list
+    anova_results[[variable]] <- summary(anova_result)
+  }
+  
+  return(anova_results)
+}
+```
+
+```{r, include=FALSE}
+call_ANOVA <- function(data, target_variable, columns_to_process) {
+  anova_results <- perform_ANOVA(fleet3, target_variable, columns_to_process)
+  # Print ANOVA results for each column
+  for (variable in names(anova_results)) {
+    print(paste("ANOVA results for", variable))
+    print(anova_results[[variable]])
+  }
+}
+```
+
+```{r, include=FALSE}
+# Call this func for all the fleets
+call_ANOVA(fleet3, "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s", columns_to_process)
+```
+
+### Fleet Insights: Statistical Test Interpretations 
+
+### Interpretations for Fleet3
+
+Interpretation for each ANOVA test result for the variables concerning their impact on the "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s":
+
+**Engine_Coolant_Temperature_degreesC**
+
+Interpretation: The p-value is significantly less than 0.05 (<2e-16), indicating a statistically significant difference between groups. This suggests that the variable "Engine_Coolant_Temperature_degreesC" significantly affects the "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Manifold_Absolute_Pressure_kPa**
+
+Interpretation: The extremely low p-value (<2e-16) suggests a significant difference between groups. This indicates that "Intake_Manifold_Absolute_Pressure_kPa" likely has a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Engine_RPM_RPM**
+
+Interpretation: The very low p-value (<2e-16) indicates a significant difference between groups. This implies that "Engine_RPM_RPM" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Vehicle_Speed_Sensor_km_h**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Vehicle_Speed_Sensor_km_h" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Air_Temperature_degreesC**
+
+Interpretation: The p-value is significantly less than 0.05 (<2e-16), indicating a statistically significant difference between groups. This suggests that "Intake_Air_Temperature_degreesC" significantly affects "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Absolute_Throttle_Position_**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This implies that "Absolute_Throttle_Position_" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Air_Temperature_A_degreesC**
+
+Interpretation: The p-value (0.224) is greater than 0.05, suggesting that there isn't sufficient evidence to conclude a significant impact of "Intake_Air_Temperature_A_degreesC" on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Ambient_Air_Temperature_degreesC**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Ambient_Air_Temperature_degreesC" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Accelerator_Pedal_Position_D_**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Accelerator_Pedal_Position_D_" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Accelerator_Pedal_Position_E_**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Accelerator_Pedal_Position_E_" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Engine_Coolant_Temperature_A_degreesC**
+
+Interpretation: The p-value is significantly less than 0.05 (<2e-16), indicating a statistically significant difference between groups. This suggests that "Engine_Coolant_Temperature_A_degreesC" significantly affects "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+```{r,include=FALSE}
+# Call this func for fleet1
+call_ANOVA(fleet1, "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s", columns_to_process)
+```
+
+### Interpretations for Fleet 1 
+
+**Engine_Coolant_Temperature_degreesC**
+
+Interpretation: The p-value (<2e-16) is significantly less than 0.05, indicating a statistically significant difference between groups. This suggests that the variable "Engine_Coolant_Temperature_degreesC" significantly affects the "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Manifold_Absolute_Pressure_kPa**
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Intake_Manifold_Absolute_Pressure_kPa" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Engine_RPM_RPM**
+Interpretation: The very low p-value (<2e-16) indicates a significant difference between groups. This implies that "Engine_RPM_RPM" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Vehicle_Speed_Sensor_km_h**
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Vehicle_Speed_Sensor_km_h" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Air_Temperature_degreesC**
+Interpretation: The p-value (<2e-16) is significantly less than 0.05, indicating a statistically significant difference between groups. This suggests that "Intake_Air_Temperature_degreesC" significantly affects "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Absolute_Throttle_Position_**
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This implies that "Absolute_Throttle_Position_" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Air_Temperature_A_degreesC**
+Interpretation: The p-value (0.224) is greater than 0.05, indicating a lack of evidence to conclude a significant impact of "Intake_Air_Temperature_A_degreesC" on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Ambient_Air_Temperature_degreesC**
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Ambient_Air_Temperature_degreesC" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Accelerator_Pedal_Position_D_**
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Accelerator_Pedal_Position_D_" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Accelerator_Pedal_Position_E_**
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Accelerator_Pedal_Position_E_" is likely to have a significant impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Engine_Coolant_Temperature_A_degreesC**
+Interpretation: The p-value (<2e-16) is significantly less than 0.05, indicating a statistically significant difference between groups. This suggests that "Engine_Coolant_Temperature_A_degreesC" significantly affects "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+```{r, include=FALSE}
+# Call this func for fleet2
+call_ANOVA(fleet2, "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s", columns_to_process)
+```
+
+### Interpretations for Fleet 2 
+
+**Engine_Coolant_Temperature_degreesC**
+
+Interpretation: The p-value is significantly less than 0.05 (<2e-16), indicating a statistically significant difference between groups. This suggests that the variable "Engine_Coolant_Temperature_degreesC" significantly affects the "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Manifold_Absolute_Pressure_kPa**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Intake_Manifold_Absolute_Pressure_kPa" is highly likely to have a substantial impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Engine_RPM_RPM**
+
+Interpretation: The very low p-value (<2e-16) indicates a significant difference between groups. This implies that "Engine_RPM_RPM" is highly likely to have a substantial impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Vehicle_Speed_Sensor_km_h**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Vehicle_Speed_Sensor_km_h" is highly likely to have a substantial impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Air_Temperature_degreesC**
+
+Interpretation: The p-value is significantly less than 0.05 (<2e-16), indicating a statistically significant difference between groups. This suggests that "Intake_Air_Temperature_degreesC" significantly affects "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Absolute_Throttle_Position_**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Absolute_Throttle_Position_" is highly likely to have a substantial impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Air_Temperature_A_degreesC**
+
+Interpretation: The p-value (0.224) is greater than 0.05, indicating that there isn't enough evidence to conclude a significant impact of "Intake_Air_Temperature_A_degreesC" on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Ambient_Air_Temperature_degreesC**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Ambient_Air_Temperature_degreesC" is highly likely to have a substantial impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Accelerator_Pedal_Position_D_**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Accelerator_Pedal_Position_D_" is highly likely to have a substantial impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Accelerator_Pedal_Position_E_**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Accelerator_Pedal_Position_E_" is highly likely to have a substantial impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Engine_Coolant_Temperature_A_degreesC**
+
+Interpretation: The p-value is significantly less than 0.05 (<2e-16), indicating a statistically significant difference between groups. This suggests that "Engine_Coolant_Temperature_A_degreesC" significantly affects "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+```{r,include=FALSE}
+# Call this func for fleet4
+call_ANOVA(fleet4, "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s", columns_to_process)
+```
+
+### Interpretations for Fleet 4
+
+**Engine_Coolant_Temperature_degreesC**
+
+Interpretation: The p-value is significantly less than 0.05 (<2e-16), indicating a statistically significant difference between groups. This suggests that the variable "Engine_Coolant_Temperature_degreesC" significantly affects the "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Manifold_Absolute_Pressure_kPa**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Intake_Manifold_Absolute_Pressure_kPa" is highly likely to have a substantial impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Engine_RPM_RPM**
+
+Interpretation: The very low p-value (<2e-16) indicates a significant difference between groups. This implies that "Engine_RPM_RPM" is highly likely to have a substantial impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Vehicle_Speed_Sensor_km_h**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Vehicle_Speed_Sensor_km_h" is highly likely to have a substantial impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Air_Temperature_degreesC**
+
+Interpretation: The p-value is significantly less than 0.05 (<2e-16), indicating a statistically significant difference between groups. This suggests that "Intake_Air_Temperature_degreesC" significantly affects "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Absolute_Throttle_Position_**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Absolute_Throttle_Position_" is highly likely to have a substantial impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Intake_Air_Temperature_A_degreesC**
+
+Interpretation: The p-value (0.224) is greater than 0.05, indicating that there isn't enough evidence to conclude a significant impact of "Intake_Air_Temperature_A_degreesC" on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Ambient_Air_Temperature_degreesC**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Ambient_Air_Temperature_degreesC" is highly likely to have a substantial impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Accelerator_Pedal_Position_D_**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Accelerator_Pedal_Position_D_" is highly likely to have a substantial impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Accelerator_Pedal_Position_E_**
+
+Interpretation: The extremely low p-value (<2e-16) indicates a significant difference between groups. This suggests that "Accelerator_Pedal_Position_E_" is highly likely to have a substantial impact on "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Engine_Coolant_Temperature_A_degreesC**
+
+Interpretation: The p-value is significantly less than 0.05 (<2e-16), indicating a statistically significant difference between groups. This suggests that "Engine_Coolant_Temperature_A_degreesC" significantly affects "Air_Flow_Rate_from_Mass_Flow_Sensor_g_s".
+
+**Now we will bin for both the target and independent variables**
+
+```{r , include=FALSE}
+plot_binned_variables <- function(dataset, columns_to_process, target_variable) {
+  # Create an empty list to store the plots
+  plot_list <- list()
+  
+  # Binning for the target variable
+  dataset <- dataset %>%
+    mutate(target_bin = cut(!!sym(target_variable), breaks = 4))
+  
+  # Loop through the vector of column names
+  for (variable in columns_to_process) {
+    # Replace NA with zero in the dataset for the current column
+    dataset <- dataset %>%
+      mutate(!!sym(variable) := ifelse(is.na(!!sym(variable)), 0, !!sym(variable))) 
+    
+    # Binning for both categorical and numeric variables
+    if (is.numeric(dataset[[variable]])) {
+      dataset <- dataset %>%
+        mutate(!!sym(paste0(variable, "_bin")) := cut(!!sym(variable), breaks = 4))
+    } else {
+      dataset[[variable]] <- as.factor(dataset[[variable]])
+    }
+    
+    # Create a boxplot for the current column w.r.t target variable
+    p <- ggplot(data = dataset, aes(x = !!sym(paste0(variable, "_bin")), y = !!sym(target_variable))) +
+      geom_boxplot(fill = "#69b3a2") +
+      theme_minimal() +
+      xlab(variable) +
+      ylab(target_variable) +
+      ggtitle(paste("Boxplot of", variable, "vs", target_variable))
+    
+    # Store the plot in the list
+    plot_list[[variable]] <- p
+  }
+  
+  # Print or display the plots from the list
+  for (i in 1:length(plot_list)) {
+    print(plot_list[[i]])
+  }
+}
+```
+
+```{r, include=FALSE}
+# Call the function with columns_to_process and target variable
+plot_binned_variables(fleet3, columns_to_process, target_variable)
+```
+
+**KDE Plots:**
+```{r, include=FALSE}
+# Create a list to store the plots
+plots <- list()
+
+# Loop through each column and create density plots
+for (col in columns_to_process) {
+  if (col != target_variable) {
+    p <- ggplot(fleet3, aes_string(x = fleet3[[target_variable]], fill = col)) +
+      geom_density(alpha = 0.5) +
+      labs(title = paste("Density plot of", target_variable, "and", col))
+    
+    plots[[col]] <- p
+  }
+}
+
+# Display the plots
+for (p in plots) {
+  print(p)
+}
+```
+### Implementation
+
+We conducted a similarity analysis of Fleet 2, Fleet 3 and Fleet 4 with respect to Fleet 1, and selected 500 observations from all fleets that were similar to Fleet 1, i.e., less than 250. In these 500 observations, we replaced each Non-Trimmable parameter in Fleet 2, Fleet 3 and Fleet 4 with the mean Non-Trimmable value of Fleet 1. This was done because we wanted to recommend based on the fixed Non-Trimmable values, as they cannot be modified by the driver. We trained our model using the modified dataset, which took into account the above factors, using data from Fleet 2, Fleet 3 and Fleet 4. After training the model, we predicted the value for Air Flow Mass for Fleet 2, Fleet 3 and Fleet 4 using this trained model. Based on these predicted values of Air Flow, we are providing recommendations to Fleet 1 regarding their Trimmable parameters, as they can be modified by the driver.
+![](recommendation.jpg)
+
+**Similarity Analysis**
+
+**Similarity Analysis of Vehicle Fleets**
+
+In the realm of fleet management and operational optimization, understanding the similarities and dissimilarities between vehicle fleets is crucial. The similarity analysis undertaken in this study aimed to precisely quantify the resemblance among distinct fleet subsets, leveraging selected operational features as key indicators.
+
+**Objective and Methodology**
+The primary goal of this analysis was to evaluate the extent of similarity between Fleet 1 and other fleet subsets, namely Fleet 2, Fleet 3, and Fleet 4. To achieve this, a comprehensive approach employing various distance metrics was adopted, with a specific focus on Euclidean distances.
+
+**1) Data Selection and Preparation**
+The dataset encompassed an array of operational attributes pertinent to vehicle performance and functionality. Four specific fleet subsets (Fleet 1, Fleet 2, Fleet 3, and Fleet 4) were meticulously isolated from this dataset to facilitate a comparative study.
+
+In order to ensure a manageable yet statistically representative dataset, a subsampling strategy was implemented. A subset of 1000 randomly sampled instances was extracted from each fleet, allowing for a balanced and fair comparison across the fleets.
+
+**2) Distance Metric Utilization**
+Distance metrics serve as the bedrock for measuring the dissimilarity or similarity between datasets. In this analysis, emphasis was placed on Euclidean distances, a fundamental metric in quantifying the difference between vectors in multi-dimensional space.
+
+**3) Assessment and Comparison**
+The selected operational features were pivotal in delineating the operational characteristics of each fleet subset. The Euclidean distances were computed systematically across these features to quantify the dissimilarities between Fleet 1 and the other fleets.
+
+**4) Result Visualization**
+
+![](Similarity.png)
+
+**Interpretation of Euclidean Distances:**
+
+A lower Euclidean distance between Fleet 1 and a specific fleet subset implies a higher degree of similarity in their operational attributes. Conversely, a larger distance indicates more pronounced differences in the assessed features between Fleet 1 and the compared fleet.
+
+**Predicting the values of Air Flow Rate using the trained models**
+
+```{r}
+library(party)
+model_2 <- readRDS("tuned_model_for_fleet_2.rds")
+summary(model_2)
+```
+**Interpretation of the model:**
+
+MSE (Mean Squared Error): The model's average prediction error is 100. A lower value suggests our model is performing well in making accurate predictions.
+
+R-squared (rsq): With an R-squared value of 100, we need to be cautious as extremely high values may indicate that the model is fitting the training data too closely, possibly leading to overfitting.
+
+Number of Trees (ntree): Our random forest model comprises a single tree. While a small number may reduce complexity, it's important to consider whether this is optimal for the dataset.
+
+Number of Variables Randomly Sampled (mtry): The model randomly considers one variable at each split. Adjusting this can impact the diversity of trees and overall model performance.
+
+Importance: The length of 12 suggests the model identifies 12 predictor variables as important in making predictions. Understanding these variables is crucial for insight.
+
+Forest: The forest consists of 11 trees. To understand the model fully, exploring the details of each tree can provide insights into its decision-making process.
+
+Predicted: The length of 178,008 indicates the model provides predicted values for each observation in our dataset. These predictions are based on the learned patterns.
+
+OOB Error (oob.times): The length of 178,008 suggests the model estimates its performance on new, unseen data for each observation. This out-of-bag error estimation helps assess generalization.
+```{r}
+model_3 <- readRDS("tuned_model_for_fleet_3.rds")
+summary(model_3)
+```
+**Interpretation of the model:**
+
+MSE (Mean Squared Error): The model's average prediction error is 100. A lower value suggests better model performance in terms of accuracy.
+
+R-squared (rsq): The R-squared value of 100 indicates a potentially high fit to the training data. Caution is advised, as very high values may signal overfitting.
+
+Number of Trees (ntree): The random forest model comprises a single tree. Consideration should be given to whether this level of complexity is suitable for the dataset.
+
+Number of Variables Randomly Sampled (mtry): The model randomly considers one variable at each split. Adjusting this parameter can impact tree diversity and overall model performance.
+
+Importance: The model identifies 12 predictor variables as important in making predictions. Understanding these variables is crucial for gaining insights into the model's decision-making.
+Forest:
+
+The forest consists of 11 trees. To understand the model fully, exploring the details of each tree can provide insights into its decision process.
+
+Predicted: The model generates predicted values for each of the 43,714 observations in the dataset. These predictions are based on the patterns learned during training.
+
+OOB Error (oob.times): The model estimates its performance on new, unseen data for each of the 43,714 observations. This out-of-bag error estimation helps assess generalization to new data.
+```{r}
+model_4 <- readRDS("tuned_model_for_fleet_4.rds")
+summary(model_4)
+```
+**Interpretation of the model:**
+
+MSE (Mean Squared Error): The model's average prediction error is 500. A lower value indicates better model performance in terms of accuracy.
+
+R-squared (rsq): The R-squared value of 500 suggests a potentially high fit to the training data. Be cautious, as very high values may indicate overfitting.
+
+Number of Trees (ntree): The random forest model comprises a single tree. Consider whether this level of complexity is suitable for the dataset.
+
+Number of Variables Randomly Sampled (mtry): The model randomly considers one variable at each split. Adjusting this parameter can impact tree diversity and overall model performance.
+
+Importance: The model identifies 12 predictor variables as important in making predictions. Understanding these variables is crucial for gaining insights into the model's decision-making.
+
+Forest: The forest consists of 11 trees. To understand the model fully, explore the details of each tree to gain insights into the decision process.
+
+Predicted: The model generates predicted values for each of the 43,712 observations in the dataset. These predictions are based on the patterns learned during training.
+
+OOB Error (oob.times): The model estimates its performance on new, unseen data for each of the 43,712 observations. This out-of-bag error estimation helps assess generalization to new data.
+```{r}
+df2=read.csv("Fleet_prediction_data_fleet_2.csv")
+df3=read.csv("Fleet_prediction_data_fleet_3.csv")
+df4=read.csv("Fleet_prediction_data_fleet_4.csv")
+```
+```{r}
+df2_temp=df2
+df3_temp=df3
+df4_temp=df4
+```
+```{r}
+#Removing the columns which are not needed for predicting Air_Flow_Rate_from_Mass_Flow_Sensor_g_s
+df2_temp$X <- NULL
+df2_temp$Unnamed..0<-NULL
+df2_temp$label<-NULL
+df2_temp$distance_from_1<-NULL
+df2_temp$Time<-NULL
+df2_temp$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s<-NULL
+
+df3_temp$X <- NULL
+df3_temp$Unnamed..0<-NULL
+df3_temp$label<-NULL
+df3_temp$distance_from_1<-NULL
+df3_temp$Time<-NULL
+df3_temp$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s<-NULL
+
+df4_temp$X <- NULL
+df4_temp$Unnamed..0<-NULL
+df4_temp$label<-NULL
+df4_temp$distance_from_1<-NULL
+df4_temp$Time<-NULL
+df4_temp$Air_Flow_Rate_from_Mass_Flow_Sensor_g_s<-NULL
+
+```
+```{r}
+#Predicting Air_Flow_Rate_from_Mass_Flow_Sensor_g_s from the trained models for Fleet1, 2 and 3.
+library(randomForest)
+Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_2 <- predict(model_2, newdata = df2_temp)
+Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_3 <- predict(model_3, newdata = df3_temp)
+Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_4 <- predict(model_4, newdata = df4_temp)
+```
+```{r}
+#Adding the column Predicted Air_Flow_Rate_from_Mass_Flow_Sensor_g_s to the dataframe 
+df2$Predicted_Air_Flow_Rate_from_Mass_Flow_Sensor_g_s <- Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_2
+df3$Predicted_Air_Flow_Rate_from_Mass_Flow_Sensor_g_s <- Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_3
+df4$Predicted_Air_Flow_Rate_from_Mass_Flow_Sensor_g_s <- Air_Flow_Rate_from_Mass_Flow_Sensor_g_s_4
+```
+### Results
+**Recommendations from 2nd Fleet For Accelerator Pedal Position D**
+
+![](Recommendation_from_Fleet_2_D.png)
+The t-statistic of -8.4754 and a p-value of 8.3257e-17 strongly reject the null hypothesis, confirming that recommendation is possible from Fleet 2 for Accelerator Pedal Position D.The analysis of Accelerator Pedal Position D in the 2nd Fleet data reveals a significant increase in mean values from 23.204 to 30.441, with the median rising from 14.500 to 31.200. The standard deviation increases from 11.899 to 14.906. 
+
+**Recommendations from 2nd Fleet For Accelerator Pedal Position E**
+
+![](Recommendation_from_Fleet_2_E.png)
+The t-statistic of -9.1884 and a p-value of 2.2512e-19 reject the null hypothesis, indicating that recommendation is possible from Fleet 2 for Accelerator Pedal Position E. Similarly, Accelerator Pedal Position E exhibits a notable mean increase from 23.461 to 31.299, with the median rising from 14.500 to 31.800. The standard deviation increases from 11.930 to 14.857. 
+
+**Recommendations from 3rd Fleet For Accelerator Pedal Position D**
+
+
+![](Recommendation_from_Fleet_3_D.png)
+The t-statistic of -6.7456 and a low p-value of 2.5767e-11 highlight a statistically significant change, suggesting that recommendation is possible from Fleet 3 for Accelerator Pedal Position D.Analyzing Accelerator Pedal Position D in the 3rd Fleet data reveals a significant shift in means from 23.823 to 30.328, with the median moving from 14.500 to 19.400. The standard deviation also increases from 11.956 to 17.920 in the new readings. 
+
+**Recommendations from 3rd Fleet For Accelerator Pedal Position E**
+
+![](Recommendation_from_Fleet_3_E.png)
+
+The t-statistic of -9.7349 and a low p-value of 1.8593e-21 underscore a substantial and statistically significant change, indicating that recommendation is possible from Fleet 3 for Accelerator Pedal Position E.Similarly, Accelerator Pedal Position E in the 3rd Fleet data exhibits a significant mean increase from 24.042 to 33.297. The median shifts from 14.500 to 32.950, and the standard deviation rises from 11.960 to 17.550 in the new readings. 
+
+**Recommendations from 4th Fleet For Accelerator Pedal Position D**
+
+
+![](Recommendation_from_Fleet_4_D.png)
+The remarkably high t-statistic of 11.2875 and p-value of 6.8289 indicates an extremely significant and substantial change, suggesting that recommendation is possible from Fleet 4 for Accelerator Pedal Position D.The statistical analysis of Accelerator Pedal Position D in the 4th Fleet data reveals a significant shift, with a substantial decrease in mean from 23.944 to 16.442 and a shift in median values from 14.500 to 14.100. The standard deviation for Position D notably decreases from 12.138 to 8.548. 
+
+**Recommendations from 4th Fleet For Accelerator Pedal Position E**
+
+![](Recommendation_from_Fleet_4_E.png)
+The remarkably high t-statistic of 11.3117 and p-value of 5.353 for Position E indicates an extremely significant and substantial change, suggesting that recommendation is possible from Fleet 4 for Accelerator Pedal Position E. Similarly, Accelerator Pedal Position E in the 4th Fleet data shows a marked decrease in mean from 24.341 to 16.804, with a stable median at 14.500 for both previous and new readings. The standard deviation for Position E notably decreases from 12.263 to 8.437. 
+
+### References
+1) Investigations of anomaly detection in automotive ECUs by distributed observers with a focus on the plausibility check of communication signals
+Weber, Marc
+https://publikationen.bibliothek.kit.edu/1000092815
+
+2) Automotive OBD-II Dataset
+Weber, Marc
+https://publikationen.bibliothek.kit.edu/1000085073
